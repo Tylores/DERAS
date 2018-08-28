@@ -1,18 +1,24 @@
+#include <iostream>
+#include <string>
+#include <map>
+
 #include "include/DistributedEnergyResource.hpp"
 
 DistributedEnergyResource::DistributedEnergyResource (
-    std::map <std::string, std::string> init) :
-    rated_export_power_(stoul(init["ExportPower"])),
-    rated_export_energy_(stoul(init["ExportEnergy"])),
-    export_ramp_(stoul(init["ExportRamp"])),
-    rated_import_power_(stoul(init["ImportPower"])),
-    rated_import_energy_(stoul(init["ImportEnergy"])),
-    import_ramp_(stoul(init["ImportRamp"])),
-    idle_losses_(stoul(init["IdleLosses"])),
+    std::map <std::string, unsigned int> init,
+    const std::string& path) :
+    rated_export_power_(init["ExportPower"]),
+    rated_export_energy_(init["ExportEnergy"]),
+    export_ramp_(init["ExportRamp"]),
+    rated_import_power_(init["ImportPower"]),
+    rated_import_energy_(init["ImportEnergy"]),
+    import_ramp_(init["ImportRamp"]),
+    idle_losses_(init["IdleLosses"]),
+    path_(path),
     export_power_(0),
     export_energy_(rated_export_energy_),
     import_power_(0),
-    import_energy_(0),
+    import_energy_(rated_import_energy_),
     export_watts_(0),
     import_watts_(0),
     delta_time_(0) {
@@ -145,6 +151,11 @@ unsigned int DistributedEnergyResource::GetIdleLosses () {
     return idle_losses_;
 }  // end Get Idle Losses
 
+// Get Path
+// - get the path to the DER
+std::string DistributedEnergyResource::GetPath () {
+    return path_;
+}  // end Get Idle Losses
 // Import Power
 // - called by control loop if import power is set
 // - assume loss is factored into import power
@@ -228,3 +239,11 @@ void DistributedEnergyResource::Loop (float delta_time) {
         IdleLoss ();
     }
 }  // end Control
+
+void DistributedEnergyResource::Print () {
+    std::cout << "\nDER: " << path_ << std::endl;
+    std::cout << "Export Energy:\t" << export_energy_ << '\n'
+        << "Export Power:\t" << export_power_ << '\n'
+        << "Import Energy:\t" << import_energy_ << '\n'
+        << "Import Power:\t" << import_power_ << std::endl;
+}

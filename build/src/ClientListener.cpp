@@ -39,6 +39,18 @@ void ClientListener::ObjectDiscovered (ajn::ProxyBusObject& proxy) {
     proxy.RegisterPropertiesChangedListener(
         client_interface_, props_, 7, *this, NULL
     );
+    ajn::MsgArg values;
+    proxy.GetAllProperties (client_interface_, values);
+
+    std::map <std::string, unsigned int> init;
+    init = ClientListener::MapProperties (values);
+
+    for (const auto& property : init) {
+        std::cout << property.first << '\t' << property.second;
+    }
+   
+    std::string path = proxy.GetPath();
+    vpp_->AddResource (init, path);
 } // end ObjectDiscovered
 
 // ObjectLost
@@ -58,16 +70,13 @@ void ClientListener::PropertiesChanged (ajn::ProxyBusObject& obj,
                                         const ajn::MsgArg& changed,
                                         const ajn::MsgArg& invalidated,
                                         void* context) {
-    std::map <std::string, std::string> init;
+    std::map <std::string, unsigned int> init;
     init = ClientListener::MapProperties (changed);
-    for (const auto& property : init) {
-        std:: cout << property.first << '\t' << property.second << std::endl;
-    }
 } // end PropertiesChanged
 
-std::map <std::string, std::string> ClientListener::MapProperties (
+std::map <std::string, unsigned int> ClientListener::MapProperties (
     const ajn::MsgArg& properties) {
-    std::map <std::string, std::string> init;
+    std::map <std::string, unsigned int> init;
     size_t nelem = 0;
     ajn::MsgArg* elems = NULL;
     QStatus status = properties.Get("a{sv}", &nelem, &elems);
@@ -78,7 +87,8 @@ std::map <std::string, std::string> ClientListener::MapProperties (
         for (size_t i = 0; i < nelem; i++) {
             status = elems[i].Get("{sv}", &name, &val);
             val->Get("u", &property);
-            init[name] = std::to_string(property);
+            std::cout << name << '\t' << property << std::endl;
+            init[name] = property;
         }
     } 
     return init;

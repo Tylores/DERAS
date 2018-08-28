@@ -45,7 +45,7 @@ private:
     // composition
     ajn::BusAttachment* bus_;
     ajn::Observer* obs_;
-    Aggregator* vpp;
+    Aggregator* vpp_;
 
 
     // properties
@@ -53,7 +53,7 @@ private:
     static const char* props_[];
 
     // Methods
-    std::map <std::string, std::string> MapProperties (
+    std::map <std::string, unsigned int> MapProperties (
         const ajn::MsgArg& properties
     );
 };

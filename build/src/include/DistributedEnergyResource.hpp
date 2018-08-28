@@ -1,15 +1,15 @@
 #ifndef DISTRIBUTEDENERGYRESOURCE_H
 #define DISTRIBUTEDENERGYRESOURCE_H
 
-#include <string>
-#include <map>
-
 class DistributedEnergyResource {
     public:
         // constructor / destructor
-        DistributedEnergyResource (std::map <std::string, std::string> init);
+        DistributedEnergyResource (std::map <std::string, unsigned int> init,
+                                   const std::string& path
+        );
         virtual ~DistributedEnergyResource ();
         void Loop (float delta_time);
+        void Print ();
 
 
     public:
@@ -44,6 +44,7 @@ class DistributedEnergyResource {
         
         // get idle methods
         unsigned int GetIdleLosses ();
+        std::string GetPath ();
 
     private:
         // controls
@@ -64,6 +65,7 @@ class DistributedEnergyResource {
         
         // rated idle properties
         unsigned int idle_losses_;              // (Wh h^-1)
+        std::string path_;
 
     private:
         // dynamic properties

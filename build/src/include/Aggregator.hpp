@@ -8,7 +8,12 @@ public:
     Aggregator ();
     virtual ~Aggregator ();
 
-    void AddResource (std::map <std::string, std::string>& init);
+    void AddResource (std::map <std::string, unsigned int>& init,
+                      const std::string& path
+    );
+    void UpdateResource (std::map <std::string, unsigned int>& init,
+                         const std::string& path
+    );
     void RemoveResource (const std::string& path);
     void DisplayAll ();
     void DisplayFiltered ();

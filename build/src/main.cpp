@@ -55,14 +55,12 @@ static void Help () {
     cout << "\n\t[Help Menu]\n\n";
     cout << "> q            quit\n";
     cout << "> h            display help menu\n";
-    cout << "> i <watts>    import power\n";
-    cout << "> e <watts>    export power\n";
-    cout << "> p            print properties\n";
+    cout << "> a            print all resources\n";
 } // end Help
 
 // Command Line Interface
 // - method to allow user controls during program run-time
-static bool CommandLineInterface (const string& input) {
+static bool CommandLineInterface (const string& input, Aggregator* vpp) {
     // check for program argument
     if (input == "") {
         return false;
@@ -80,6 +78,10 @@ static bool CommandLineInterface (const string& input) {
     switch (cmd) {
         case 'q':
            return true;
+
+        case 'a': {
+            vpp->DisplayAll();
+        }
 
         default: {
             Help();
@@ -181,7 +183,7 @@ int main (int argc, char** argv) {
 
     while (!done) {
         getline(cin, input);
-        done = CommandLineInterface(input);
+        done = CommandLineInterface(input, vpp_ptr);
     }
 
     cout << "\nProgram shutting down...\n";
