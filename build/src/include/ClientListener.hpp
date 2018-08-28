@@ -31,7 +31,7 @@ public :
     // member functions
     ClientListener (ajn::BusAttachment* bus,
                     ajn::Observer* obs,
-                    const char* server_name);
+                    const char* client_name);
     void ObjectDiscovered (ajn::ProxyBusObject& proxy);
     void ObjectLost (ajn::ProxyBusObject& proxy);
     void PropertiesChanged (ajn::ProxyBusObject& proxy,
@@ -46,7 +46,7 @@ private:
 
     // properties
     const char* client_interface_;
-    const char* props[];
+    static const char* props_[];
 };
 
 #endif // CLIENTLISTENER_HPP_INCLUDED

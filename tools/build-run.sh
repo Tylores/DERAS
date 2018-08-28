@@ -10,8 +10,8 @@ export AJINC=$AJ_ROOT/build/linux/$CPU/$VARIANT/dist/cpp/inc
 export LD_LIBRARY_PATH=$AJLIB:$LD_LIBRARY_PATH
 
 # build
-export SRC=dcs
+export SRC=deras
 make -C ../build
 
 # run
-./../build/bin/debug/$SRC -c ../data/config.ini -t 300
+./../build/bin/debug/$SRC

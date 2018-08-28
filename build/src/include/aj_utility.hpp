@@ -223,10 +223,10 @@ static QStatus SetupBusAttachment (const tsu::config_map& ini_map,
     assert (status == ER_OK);
 
     printf("\n\t\t\tBuilding device interface...\n");
-    std::string device_interface = tsu::GetSectionProperty (ini_map,
+    std::string client_interface = tsu::GetSectionProperty (ini_map,
                                                        "AllJoyn",
-                                                       "device_interface");
-    status = aj_utility::BuildDeviceInterface (device_interface, &bus_ref);
+                                                       "client_interface");
+    status = aj_utility::BuildClientInterface (client_interface, &bus_ref);
     assert (status == ER_OK);
 
     ajn::SessionOpts opts(ajn::SessionOpts::TRAFFIC_MESSAGES,

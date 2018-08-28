@@ -59,6 +59,36 @@ static void Help () {
     cout << "> p            print properties\n";
 } // end Help
 
+// Command Line Interface
+// - method to allow user controls during program run-time
+static bool CommandLineInterface (const string& input) {
+    // check for program argument
+    if (input == "") {
+        return false;
+    }
+    char cmd = input[0];
+
+    // deliminate input string to argument parameters
+    vector <string> tokens;
+    stringstream ss(input);
+    string token;
+    while (ss >> token) {
+        tokens.push_back(token);
+    }
+
+    switch (cmd) {
+        case 'q':
+           return true;
+
+        default: {
+            Help();
+            break;
+        }
+    }
+
+    return false;
+}  // end Command Line Interface
+
 // Main
 // ----
 int main (int argc, char** argv) {
@@ -87,7 +117,7 @@ int main (int argc, char** argv) {
     #endif // ROUTER
 
     cout << "\n\t\tCreating message bus...\n";
-    const char* app_name = ini_map["AllJoyn"]["app"];
+    const char* app_name = ini_map["AllJoyn"]["app"].c_str();
     bool allow_remote = true;
     BusAttachment *bus_ptr = new BusAttachment(app_name, allow_remote);
     assert(bus_ptr != NULL);
@@ -99,7 +129,7 @@ int main (int argc, char** argv) {
 
     cout << "\n\t\tEstablishing session port...\n";
     aj_utility::SessionPortListener SPL;
-    unsigned int port = stoul (ini_map["AllJoyn"]["port"]);
+    ajn::SessionPort port = stoul (ini_map["AllJoyn"]["port"]);
 
     cout << "\n\t\tSetting up bus attachment...\n";
     QStatus status = aj_utility::SetupBusAttachment (ini_map,
@@ -115,8 +145,8 @@ int main (int argc, char** argv) {
     }
 
     cout << "\n\t\tCreating observer...\n";
-    const char* client_interface = ini_map["AllJoyn"]["client_interface"];
-    Observer *obs_ptr = new Observer(*bus_ptr, &client_interface, 1);
+    const char* client_name = ini_map["AllJoyn"]["client_interface"].c_str();
+    Observer *obs_ptr = new Observer(*bus_ptr, &client_name, 1);
 
     cout << "\n\t\tCreating listener...\n";
     ClientListener *listner_ptr = new ClientListener(bus_ptr,
@@ -125,10 +155,10 @@ int main (int argc, char** argv) {
     obs_ptr->RegisterListener(*listner_ptr);
 
     cout << "\n\t\tCreating bus object...\n";
-    const char* server_interface = ini_map["AllJoyn"]["server_interface"];
-    const char* path = ini_map["AllJoyn"]["path"];
+    const char* server_name = ini_map["AllJoyn"]["server_interface"].c_str();
+    const char* path = ini_map["AllJoyn"]["path"].c_str();
     SmartGridDevice *sgd_ptr = new SmartGridDevice(bus_ptr, 
-                                                   server_interface, 
+                                                   server_name, 
                                                    path);
 
     cout << "\n\t\t\tRegistering bus object...\n";
@@ -140,23 +170,19 @@ int main (int argc, char** argv) {
     about_ptr->Announce(port, about_data);
 
     cout << "\nProgram initialization complete...\n";
-    thread DER(ResourceLoop, der_ptr);
 
     Help ();
     string input;
 
     while (!done) {
         getline(cin, input);
-        done = CommandLineInterface(input, DER);
+        done = CommandLineInterface(input);
     }
 
     cout << "\nProgram shutting down...\n";
     cout << "\n\t Joining threads...\n";
-    CLI.join();
-    DER.join();
 
     cout << "\n\t deleting pointers...\n";
-    delete der_ptr;
     delete sgd_ptr;
     delete listner_ptr;
     delete obs_ptr;
