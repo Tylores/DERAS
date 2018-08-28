@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+
 
 #include <alljoyn/ProxyBusObject.h>
 #include <alljoyn/BusAttachment.h>
@@ -21,8 +21,10 @@ const char* ClientListener::props_[] = {"export_power",
 ClientListener::ClientListener(
     ajn::BusAttachment* bus,
     ajn::Observer* obs,
+    Aggregator* vpp,
     const char* client_name) : bus_(bus),
                                obs_(obs),
+                               vpp_(vpp),
                                client_interface_(client_name){
 } // end ClientListener
 
@@ -56,19 +58,28 @@ void ClientListener::PropertiesChanged (ajn::ProxyBusObject& obj,
                                         const ajn::MsgArg& changed,
                                         const ajn::MsgArg& invalidated,
                                         void* context) {
-    size_t nelem = 0;
-    ajn::MsgArg* elems = NULL;
-    QStatus status = changed.Get("a{sv}", &nelem, &elems);
-    std::cout << "Properties Changed" << std::endl;
-    if (status == ER_OK) {
-        const char* name;
-        ajn::MsgArg* val;
-        unsigned int prop;
-        for (size_t i = 0; i < nelem; i++) {
-
-            status = elems[i].Get("{sv}", &name, &val);
-            val->Get("u", &prop);
-            std::cout << name << '\t' << prop << std::endl;
-        }
+    std::map <std::string, std::string> init;
+    init = ClientListener::MapProperties (changed);
+    for (const auto& property : init) {
+        std:: cout << property.first << '\t' << property.second << std::endl;
     }
 } // end PropertiesChanged
+
+std::map <std::string, std::string> ClientListener::MapProperties (
+    const ajn::MsgArg& properties) {
+    std::map <std::string, std::string> init;
+    size_t nelem = 0;
+    ajn::MsgArg* elems = NULL;
+    QStatus status = properties.Get("a{sv}", &nelem, &elems);
+    if (status == ER_OK) {
+        const char* name;
+        unsigned int property;
+        ajn::MsgArg* val;
+        for (size_t i = 0; i < nelem; i++) {
+            status = elems[i].Get("{sv}", &name, &val);
+            val->Get("u", &property);
+            init[name] = std::to_string(property);
+        }
+    } 
+    return init;
+}

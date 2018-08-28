@@ -23,6 +23,7 @@
 
 #ifndef CLIENTLISTENER_HPP_INCLUDED
 #define CLIENTLISTENER_HPP_INCLUDED
+#include "Aggregator.hpp"
 
 class ClientListener : public ajn::MessageReceiver,
                        public ajn::Observer::Listener,
@@ -31,6 +32,7 @@ public :
     // member functions
     ClientListener (ajn::BusAttachment* bus,
                     ajn::Observer* obs,
+                    Aggregator* vpp,
                     const char* client_name);
     void ObjectDiscovered (ajn::ProxyBusObject& proxy);
     void ObjectLost (ajn::ProxyBusObject& proxy);
@@ -43,10 +45,17 @@ private:
     // composition
     ajn::BusAttachment* bus_;
     ajn::Observer* obs_;
+    Aggregator* vpp;
+
 
     // properties
     const char* client_interface_;
     static const char* props_[];
+
+    // Methods
+    std::map <std::string, std::string> MapProperties (
+        const ajn::MsgArg& properties
+    );
 };
 
 #endif // CLIENTLISTENER_HPP_INCLUDED

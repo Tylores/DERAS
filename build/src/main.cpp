@@ -39,6 +39,7 @@
 
 #include "include/ts_utility.hpp"
 #include "include/aj_utility.hpp"
+#include "include/Aggregator.hpp"
 #include "include/DistributedEnergyResource.hpp"
 #include "include/ClientListener.hpp"
 #include "include/SmartGridDevice.hpp"
@@ -148,9 +149,13 @@ int main (int argc, char** argv) {
     const char* client_name = ini_map["AllJoyn"]["client_interface"].c_str();
     Observer *obs_ptr = new Observer(*bus_ptr, &client_name, 1);
 
+    cout << "\n\t\tCreating virtual power plant...\n";
+    Aggregator *vpp_ptr = new Aggregator ();
+
     cout << "\n\t\tCreating listener...\n";
     ClientListener *listner_ptr = new ClientListener(bus_ptr,
                                                      obs_ptr,
+                                                     vpp_ptr,
                                                      client_name);
     obs_ptr->RegisterListener(*listner_ptr);
 
@@ -185,6 +190,7 @@ int main (int argc, char** argv) {
     cout << "\n\t deleting pointers...\n";
     delete sgd_ptr;
     delete listner_ptr;
+    delete vpp_ptr;
     delete obs_ptr;
     delete about_ptr;
     delete bus_ptr;
