@@ -57,7 +57,7 @@ static QStatus BuildClientInterface (std::string name,
     ajn::InterfaceDescription* interface = NULL;
     status = bus_ref.CreateInterface(interface_name, interface);
 
-    printf("\n\t\t\t\tCreating interface for %s...\n",interface_name);
+    printf("\t\t\t\tCreating interface for %s...\n",interface_name);
 
     // methods
     status = interface->AddMethod("ImportPower", 
@@ -159,7 +159,7 @@ static QStatus BuildClientInterface (std::string name,
     );
     assert (status == ER_OK);
 
-    printf("\n\t\t\t\tActivating interface...\n");
+    printf("\t\t\t\tActivating interface...\n");
     interface->Activate();
 
     return status;
@@ -175,7 +175,7 @@ static QStatus BuildServerInterface (std::string name,
     ajn::InterfaceDescription* interface = NULL;
     status = bus_ref.CreateInterface(interface_name, interface);
 
-    printf("\n\t\t\t\tCreating blank interface for %s...\n",interface_name);
+    printf("\t\t\t\tCreating blank interface for %s...\n",interface_name);
 
     // properties
     status = interface->AddProperty("time", "u", ajn::PROP_ACCESS_READ);
@@ -188,7 +188,7 @@ static QStatus BuildServerInterface (std::string name,
     );
     assert (status == ER_OK);
 
-    printf("\n\t\t\t\tActivating interface...\n");
+    printf("\t\t\t\tActivating interface...\n");
     interface->Activate();
 
     return status;
@@ -205,24 +205,24 @@ static QStatus SetupBusAttachment (const tsu::config_map& ini_map,
     ajn::BusAttachment& bus_ref = *bus_ptr;  // deref pointer
     ajn::AboutData& about_ref = *about_ptr;  // deref pointer
 
-    printf("\n\t\t\tStarting bus...\n");
+    printf("\t\t\tStarting bus...\n");
     status = bus_ref.Start();
     assert (status == ER_OK);
 
-    printf("\n\t\t\tConnecting to bus...\n");
+    printf("\t\t\tConnecting to bus...\n");
     status = bus_ref.Connect();
     if (status != ER_OK) {
         return status;
     }
 
-    printf("\n\t\t\tBuilding server interface...\n");
+    printf("\t\t\tBuilding server interface...\n");
     std::string server_interface = tsu::GetSectionProperty (ini_map,
                                                        "AllJoyn",
                                                        "server_interface");
     status = aj_utility::BuildServerInterface (server_interface, &bus_ref);
     assert (status == ER_OK);
 
-    printf("\n\t\t\tBuilding device interface...\n");
+    printf("\t\t\tBuilding device interface...\n");
     std::string client_interface = tsu::GetSectionProperty (ini_map,
                                                        "AllJoyn",
                                                        "client_interface");
@@ -234,10 +234,10 @@ static QStatus SetupBusAttachment (const tsu::config_map& ini_map,
                           ajn::SessionOpts::PROXIMITY_ANY,
                           ajn::TRANSPORT_ANY);
 
-    printf("\n\t\t\tBinding to session port...\n");
+    printf("\t\t\tBinding to session port...\n");
     bus_ref.BindSessionPort(port, opts, SPL);
 
-    printf("\n\t\t\tSetting about data...\n");
+    printf("\t\t\tSetting about data...\n");
     uint8_t appID[] = { 0x47, 0xFD, 0xB0, 0x08,
                         0x25, 0x22, 0x48, 0x98,
                         0x9B, 0xAE, 0xE2, 0xE2,

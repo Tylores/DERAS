@@ -32,24 +32,29 @@ ClientListener::ClientListener(
 // - a remote device has advertised the interface we are looking for.
 // - GetAllProperties and AddResource to Aggregator
 void ClientListener::ObjectDiscovered (ajn::ProxyBusObject& proxy) {
-    std::string name = proxy.GetUniqueName();
-    std::cout << "[LISTENER] : " << name << " has been discovered\n";
+    std::string path = proxy.GetPath();
+    std::string service_name = proxy.GetServiceName();
+    std::string unique_name = proxy.GetUniqueName();
+    unsigned int session_id = proxy.GetSessionId();
+
+    std::cout << "\n[LISTENER]\n";
+    std::cout << "\tPath = " << path << '\n';
+    std::cout << "\tService Name = " << service_name << '\n';
+    std::cout << "\tUnique Name = " << unique_name << '\n';
+    std::cout << "\tSession ID = " << session_id << '\n';
+
 
     bus_->EnableConcurrentCallbacks();
     proxy.RegisterPropertiesChangedListener(
         client_interface_, props_, 7, *this, NULL
     );
+
     ajn::MsgArg values;
     proxy.GetAllProperties (client_interface_, values);
 
     std::map <std::string, unsigned int> init;
     init = ClientListener::MapProperties (values);
 
-    for (const auto& property : init) {
-        std::cout << property.first << '\t' << property.second;
-    }
-   
-    std::string path = proxy.GetPath();
     vpp_->AddResource (init, path);
 } // end ObjectDiscovered
 
@@ -57,10 +62,13 @@ void ClientListener::ObjectDiscovered (ajn::ProxyBusObject& proxy) {
 // - the remote device is no longer available
 // - RemoveResource from aggregator using path
 void ClientListener::ObjectLost (ajn::ProxyBusObject& proxy) {
-    const char* name = proxy.GetUniqueName().c_str();
-    const char* path = proxy.GetPath().c_str();
-    std::cout << "[LISTENER] : " << name << " connection lost\n";
+    std::string name = proxy.GetUniqueName();
+    std::string path = proxy.GetPath();
+
+    std::cout << "\n[LISTENER] : " << name << " connection lost\n";
     std::cout << "\tPath : " << path << " no longer exists\n";
+
+    vpp_->RemoveResource (path);
 } // end ObjectLost
 
 // PropertiesChanged
@@ -72,6 +80,7 @@ void ClientListener::PropertiesChanged (ajn::ProxyBusObject& obj,
                                         void* context) {
     std::map <std::string, unsigned int> init;
     init = ClientListener::MapProperties (changed);
+    vpp_->UpdateResource (init, obj.GetPath ());
 } // end PropertiesChanged
 
 std::map <std::string, unsigned int> ClientListener::MapProperties (
@@ -87,9 +96,8 @@ std::map <std::string, unsigned int> ClientListener::MapProperties (
         for (size_t i = 0; i < nelem; i++) {
             status = elems[i].Get("{sv}", &name, &val);
             val->Get("u", &property);
-            std::cout << name << '\t' << property << std::endl;
             init[name] = property;
         }
-    } 
+    }
     return init;
 }

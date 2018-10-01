@@ -48,6 +48,7 @@ using namespace std;
 using namespace ajn;
 
 bool done = false;  //signals program to stop
+string LOG_PATH;
 
 // Help
 // - CLI interface description
@@ -56,6 +57,10 @@ static void Help () {
     cout << "> q            quit\n";
     cout << "> h            display help menu\n";
     cout << "> a            print all resources\n";
+    cout << "> f	    print target resources\n";
+    cout << "> t	    print resource totals\n";
+    cout << "> e <watts>    send export power signal to target resources\n";
+    cout << "> i <watts>    send import power signal to target resources\n";
 } // end Help
 
 // Command Line Interface
@@ -80,29 +85,80 @@ static bool CommandLineInterface (const string& input, Aggregator* vpp) {
            return true;
 
         case 'a': {
-            vpp->DisplayAll();
+            vpp->DisplayAllResources ();
+	    return false;
         }
+
+	case 'f': {
+	    vpp->DisplayTargetResources ();
+	    return false;
+	}
+
+	case 't': {
+	    vpp->DisplayTotals ();
+	    return false;
+	}
+
+	case 'e': {
+	    try {
+		vpp->ExportPower(stoul(tokens[1]));
+	    } catch(...) {
+		cout << "[ERROR]: Invalid Argument." << endl;
+	    }
+	    return false;
+	}
+
+	case 'i': {
+	    try {
+		vpp->ImportPower(stoul(tokens[1]));
+	    } catch(...) {
+		cout << "[ERROR]: Invalid Argument." << endl;
+	    }
+	    return false;
+	}
 
         default: {
             Help();
-            break;
+	    return false;
         }
     }
-
-    return false;
 }  // end Command Line Interface
+
+void AggregatorLoop (Aggregator *VPP) {
+    unsigned int time_remaining, time_past;
+    unsigned int time_wait = 500;
+    auto time_start = chrono::high_resolution_clock::now ();
+    auto time_end = chrono::high_resolution_clock::now ();
+    chrono::duration <double, milli> time_elapsed;
+
+    while (!done) {
+        time_start = chrono::high_resolution_clock::now();
+            // time since last control call;
+            time_elapsed = time_start - time_end;
+            time_past = time_elapsed.count();
+            VPP->Loop(time_past);
+        time_end = chrono::high_resolution_clock::now();
+        time_elapsed = time_end - time_start;
+
+        // determine sleep duration after deducting process time
+        time_remaining = (time_wait - time_elapsed.count());
+        time_remaining = (time_remaining > 0) ? time_remaining : 0;
+        this_thread::sleep_for (chrono::milliseconds (time_remaining));
+    }
+}  // end Aggregator Loop
 
 // Main
 // ----
 int main (int argc, char** argv) {
     cout << "\nStarting Program...\n";
-    cout << "\n\tLoading parameters...\n";
-
-    cout << "\n\tMapping configuration file...\n";
+    cout << "\tMapping configuration file...\n";
     tsu::config_map ini_map = tsu::MapConfigFile("../data/config.ini");
 
-    cout << "\n\tStarting AllJoyn...\n";
+    // (TS): I set this to global because I can't think of a good way to make it 
+    // available to all files.
+    LOG_PATH = ini_map["Logging"]["path"];
 
+    cout << "\tStarting AllJoyn...\n";
     try {
         AllJoynInit();
     } catch (exception &e) {
@@ -119,22 +175,22 @@ int main (int argc, char** argv) {
         }
     #endif // ROUTER
 
-    cout << "\n\t\tCreating message bus...\n";
+    cout << "\t\tCreating message bus...\n";
     const char* app_name = ini_map["AllJoyn"]["app"].c_str();
     bool allow_remote = true;
     BusAttachment *bus_ptr = new BusAttachment(app_name, allow_remote);
     assert(bus_ptr != NULL);
 
-    cout << "\n\t\tCreating about object...\n";
+    cout << "\t\tCreating about object...\n";
     AboutData about_data("en");
     AboutObj *about_ptr = new AboutObj(*bus_ptr);
     assert(about_ptr != NULL);
 
-    cout << "\n\t\tEstablishing session port...\n";
+    cout << "\t\tEstablishing session port...\n";
     aj_utility::SessionPortListener SPL;
     ajn::SessionPort port = stoul (ini_map["AllJoyn"]["port"]);
 
-    cout << "\n\t\tSetting up bus attachment...\n";
+    cout << "\t\tSetting up bus attachment...\n";
     QStatus status = aj_utility::SetupBusAttachment (ini_map,
                                                      port,
                                                      SPL,
@@ -147,36 +203,38 @@ int main (int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    cout << "\n\t\tCreating observer...\n";
+    cout << "\t\tCreating observer...\n";
     const char* client_name = ini_map["AllJoyn"]["client_interface"].c_str();
     Observer *obs_ptr = new Observer(*bus_ptr, &client_name, 1);
 
-    cout << "\n\t\tCreating virtual power plant...\n";
-    Aggregator *vpp_ptr = new Aggregator ();
+    cout << "\t\tCreating virtual power plant...\n";
+    Aggregator *vpp_ptr = new Aggregator (stoul(ini_map["Logger"]["increment"]));
 
-    cout << "\n\t\tCreating listener...\n";
+    cout << "\t\tCreating listener...\n";
     ClientListener *listner_ptr = new ClientListener(bus_ptr,
                                                      obs_ptr,
                                                      vpp_ptr,
                                                      client_name);
     obs_ptr->RegisterListener(*listner_ptr);
 
-    cout << "\n\t\tCreating bus object...\n";
+    cout << "\t\tCreating bus object...\n";
     const char* server_name = ini_map["AllJoyn"]["server_interface"].c_str();
     const char* path = ini_map["AllJoyn"]["path"].c_str();
     SmartGridDevice *sgd_ptr = new SmartGridDevice(bus_ptr, 
                                                    server_name, 
                                                    path);
 
-    cout << "\n\t\t\tRegistering bus object...\n";
+    cout << "\t\t\tRegistering bus object...\n";
     if (ER_OK != bus_ptr->RegisterBusObject(*sgd_ptr)){
-        printf("\n\t\t\t[ERROR] failed registration...\n");
+        printf("[ERROR] failed registration...\n");
         delete &sgd_ptr;
         return EXIT_FAILURE;
     }
     about_ptr->Announce(port, about_data);
 
-    cout << "\nProgram initialization complete...\n";
+    cout << "Program initialization complete...\n";
+
+    thread VPP (AggregatorLoop, vpp_ptr);
 
     Help ();
     string input;
@@ -186,10 +244,11 @@ int main (int argc, char** argv) {
         done = CommandLineInterface(input, vpp_ptr);
     }
 
-    cout << "\nProgram shutting down...\n";
-    cout << "\n\t Joining threads...\n";
+    cout << "Program shutting down...\n";
+    cout << "\t Joining threads...\n";
+    VPP.join ();
 
-    cout << "\n\t deleting pointers...\n";
+    cout << "\t deleting pointers...\n";
     delete sgd_ptr;
     delete listner_ptr;
     delete vpp_ptr;
@@ -197,7 +256,7 @@ int main (int argc, char** argv) {
     delete about_ptr;
     delete bus_ptr;
 
-    cout << "\n\t Shutting down AllJoyn...\n";
+    cout << "\t Shutting down AllJoyn...\n";
     obs_ptr->UnregisterAllListeners ();
 
     #ifdef ROUTER

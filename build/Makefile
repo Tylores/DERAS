@@ -30,11 +30,15 @@ LIB := -lstdc++ -lpthread -lrt -lm $(PILIBS)
 INC := -I src/include
 
 # AllJoyn Requirments
-AJFLAGS := -DROUTER
+ifeq ($(AJ_ROUTER), stand-alone)
+	AJFLAGS := -DROUTER
+else
+	AJFLAGS :=
+endif
 
 CFLAGS += $(AJFLAGS)
-LIB += -L$(AJLIB) -lalljoyn -lajrouter
-INC += -I$(AJINC)
+LIB += -L$(AJ_LIB) -lalljoyn -lajrouter
+INC += -I$(AJ_INC)
 
 $(TARGET) : $(OBJECTS)
 	@mkdir -p $(TARGETDIR)

@@ -4,6 +4,8 @@
 
 #include "include/DistributedEnergyResource.hpp"
 
+#define DEBUG(x) std::cout << x << std::endl
+
 DistributedEnergyResource::DistributedEnergyResource (
     std::map <std::string, unsigned int> init,
     const std::string& path) :
@@ -15,12 +17,12 @@ DistributedEnergyResource::DistributedEnergyResource (
     import_ramp_(init["ImportRamp"]),
     idle_losses_(init["IdleLosses"]),
     path_(path),
-    export_power_(0),
-    export_energy_(rated_export_energy_),
-    import_power_(0),
-    import_energy_(rated_import_energy_),
-    export_watts_(0),
-    import_watts_(0),
+    export_power_(init["ExportPower"]),
+    export_energy_(init["ExportEnergy"]),
+    import_power_(init["ImportPower"]),
+    import_energy_(init["ImportEnergy"]),
+    export_watts_(init["ExportPower"]),
+    import_watts_(init["ImportPower"]),
     delta_time_(0) {
     //ctor
 }
@@ -106,6 +108,10 @@ unsigned int DistributedEnergyResource::GetExportPower () {
     return power;
 }  // end Get Export Power
 
+unsigned int DistributedEnergyResource::GetRatedExportEnergy () {
+    return rated_export_energy_;
+}
+
 // Get Export Energy
 // - get the watt-hour value available to export to the grid
 unsigned int DistributedEnergyResource::GetExportEnergy () {
@@ -131,6 +137,10 @@ unsigned int DistributedEnergyResource::GetImportPower () {
     unsigned int power = import_power_;
     return power;
 }  // end Get Import Power
+
+unsigned int DistributedEnergyResource::GetRatedImportEnergy () {
+    return rated_import_energy_;
+}
 
 // Get Import Energy
 // - get the watt-hour value available to import from the grid
@@ -241,8 +251,9 @@ void DistributedEnergyResource::Loop (float delta_time) {
 }  // end Control
 
 void DistributedEnergyResource::Print () {
-    std::cout << "\nDER: " << path_ << std::endl;
-    std::cout << "Export Energy:\t" << export_energy_ << '\n'
+    std::cout << "\n[DER]: " << path_ << std::endl;
+    std::cout
+	<< "Export Energy:\t" << export_energy_ << '\n'
         << "Export Power:\t" << export_power_ << '\n'
         << "Import Energy:\t" << import_energy_ << '\n'
         << "Import Power:\t" << import_power_ << std::endl;

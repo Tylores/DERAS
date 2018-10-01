@@ -1,0 +1,11 @@
+<busconfig>
+    <type>alljoyn</type>
+    <listen>unix:abstract=alljoyn</listen>
+    <listen>tcp:iface=*,port=9955</listen>
+    <listen>udp:iface=*,port=9955</listen>
+    <limit name="auth_timeout">20000000</limit>
+    <limit name="max_incomplete_connections">1000</limit>
+    <limit name="max_completed_connections">10000</limit>
+    <limit name="max_remote_clients_tcp">10000</limit>
+    <limit name="max_remote_clients_udp">10000</limit>
+</busconfig>
