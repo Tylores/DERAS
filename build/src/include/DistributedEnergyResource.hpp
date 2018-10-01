@@ -4,8 +4,9 @@
 class DistributedEnergyResource {
     public:
         // constructor / destructor
-        DistributedEnergyResource (std::map <std::string, unsigned int> init,
-                                   const std::string& path
+        DistributedEnergyResource (
+            const std::map <std::string, unsigned int> &init,
+            const std::string& path
         );
         virtual ~DistributedEnergyResource ();
         void Loop (float delta_time);
@@ -55,6 +56,11 @@ class DistributedEnergyResource {
         void IdleLoss ();
 
     private:
+        // alljoyn properties
+        std::string path_;
+        std::string service_;
+        std::string session_;
+
         // rated export properties
         unsigned int rated_export_power_;       // (W) to grid
         unsigned int rated_export_energy_;      // (Wh)
@@ -67,7 +73,6 @@ class DistributedEnergyResource {
         
         // rated idle properties
         unsigned int idle_losses_;              // (Wh h^-1)
-        std::string path_;
 
     private:
         // dynamic properties

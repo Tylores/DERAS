@@ -7,22 +7,26 @@
 #define DEBUG(x) std::cout << x << std::endl
 
 DistributedEnergyResource::DistributedEnergyResource (
-    std::map <std::string, unsigned int> init,
-    const std::string& path) :
-    rated_export_power_(init["ExportPower"]),
-    rated_export_energy_(init["ExportEnergy"]),
-    export_ramp_(init["ExportRamp"]),
-    rated_import_power_(init["ImportPower"]),
-    rated_import_energy_(init["ImportEnergy"]),
-    import_ramp_(init["ImportRamp"]),
-    idle_losses_(init["IdleLosses"]),
+    const std::map <std::string, unsigned int> &init,
+    const std::string &path,
+    const std::string &service,
+    const std::string &session) :
     path_(path),
-    export_power_(init["ExportPower"]),
-    export_energy_(init["ExportEnergy"]),
-    import_power_(init["ImportPower"]),
-    import_energy_(init["ImportEnergy"]),
-    export_watts_(init["ExportPower"]),
-    import_watts_(init["ImportPower"]),
+    service_(service),
+    session_(session),
+    rated_export_power_(init["rated_export_power"]),
+    rated_export_energy_(init["rated_export_energy"]),
+    export_ramp_(init["export_ramp"]),
+    rated_import_power_(init["rated_import_power"]),
+    rated_import_energy_(init["rated_import_energy"]),
+    import_ramp_(init["import_ramp"]),
+    idle_losses_(init["idle_losses"]),
+    export_power_(init["export_power"]),
+    export_energy_(init["export_energy"]),
+    import_power_(init["import_power"]),
+    import_energy_(init["import_energy"]),
+    export_watts_(init["export_power"]),
+    import_watts_(init["import_power"]),
     delta_time_(0) {
     //ctor
 }

@@ -8,13 +8,14 @@
 #include "include/Aggregator.hpp"
 #include "include/logger.h"
 #include "include/tsu.h"
-#include "include/ts_utility.hpp"
 
-Aggregator::Aggregator (const tsu::config_map &init, ajn::BusAttachment *bus, unsigned int increment) :
+Aggregator::Aggregator (const tsu::config_map &init, 
+						ajn::BusAttachment *bus, 
+						unsigned int increment) :
 	config_(init),
 	bus_(bus),
 	last_log_(0),
-      	log_inc_(increment),
+    log_inc_(increment),
 	targets_(NULL),
 	total_export_energy_(0),
 	total_export_power_(0),

@@ -57,7 +57,7 @@ static QStatus BuildClientInterface (std::string name,
     ajn::InterfaceDescription* interface = NULL;
     status = bus_ref.CreateInterface(interface_name, interface);
 
-    printf("\t\t\t\tCreating interface for %s...\n",interface_name);
+    printf("\n\t\t\t\tCreating interface for %s...\n",interface_name);
 
     // methods
     status = interface->AddMethod("ImportPower", 
@@ -75,6 +75,29 @@ static QStatus BuildClientInterface (std::string name,
     assert (status == ER_OK);
 
     // properties
+    status = interface->AddProperty("rated_export_power",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "rated_export_power",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("rated_export_energy",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "rated_export_energy",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+
     status = interface->AddProperty("export_power",
                                     "u",
                                     ajn::PROP_ACCESS_READ);
@@ -106,6 +129,30 @@ static QStatus BuildClientInterface (std::string name,
 
     status = interface->AddPropertyAnnotation(
         "export_ramp",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("rated_import_power",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "rated_import_power",
+        "org.freedesktop.DBus.Property.EmitsChangedSignal",
+        "true"
+    );
+    assert (status == ER_OK);
+
+    status = interface->AddProperty("rated_import_energy",
+                                    "u",
+                                    ajn::PROP_ACCESS_READ);
+    assert (status == ER_OK);
+
+    status = interface->AddPropertyAnnotation(
+        "rated_import_energy",
         "org.freedesktop.DBus.Property.EmitsChangedSignal",
         "true"
     );
