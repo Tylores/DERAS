@@ -263,7 +263,7 @@ static QStatus SetupBusAttachment (tsu::config_map& ini_map,
     }
 
     printf("\t\t\tBuilding server interface...\n");
-    std::string server_intf = ini_map["AllJoyn"]["server_inerface"];
+    std::string server_intf = ini_map["AllJoyn"]["server_interface"];
     status = aj_utility::BuildServerInterface (server_intf, &bus_ref);
     assert (status == ER_OK);
 

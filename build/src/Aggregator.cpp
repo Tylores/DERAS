@@ -8,12 +8,15 @@
 #include "include/Aggregator.hpp"
 #include "include/logger.h"
 
-Aggregator::Aggregator (tsu::config_map &init, 
-						ajn::BusAttachment *bus) :
+#include <alljoyn/ProxyBusObject.h>
+#include <alljoyn/BusAttachment.h>
+#include <alljoyn/Status.h>
+
+Aggregator::Aggregator (tsu::config_map &init, ajn::BusAttachment *bus) :
 	config_(init),
 	bus_(bus),
 	last_log_(0),
-	log_inc_(stoul(init["Logging"]["increment"])),
+	log_inc_(stoul(init["Logger"]["increment"])),
 	total_export_energy_(0),
 	total_export_power_(0),
 	total_import_energy_(0),
@@ -41,16 +44,14 @@ unsigned int Aggregator::GetTotalImportPower () {
 
 void Aggregator::AddResource (
 	std::map <std::string, unsigned int>& init,
-	const std::string & path,
-	const std::string &service,
-	unsigned int session) {
+	ajn::ProxyBusObject proxy) {
 	std::shared_ptr <DistributedEnergyResource> 
-		der (new DistributedEnergyResource (init, path, service, session));
+		der (new DistributedEnergyResource (init, proxy));
 	resources_.push_back (std::move (der));
 }
 
 void Aggregator::UpdateResource (std::map <std::string, unsigned int>& init,
-				 const std::string& path) {
+				 				 const std::string& path) {
 	for (auto& resource : resources_) {
 		if (resource->GetPath() == path) {
 			resource->SetRatedExportEnergy (init["rated_export_energy"]);
@@ -86,14 +87,14 @@ void Aggregator::RemoveResource (const std::string& path) {
 void Aggregator::Loop (float delta_time) {
     // update all resources
     for (auto &resource : resources_) {
-	resource->Loop (delta_time);
+		resource->Loop (delta_time);
     }
 
     // log resources based on elapsed time
     unsigned int seconds = tsu::GetSeconds ();
     if (seconds != last_log_ && seconds % log_inc_ == 0) {
-	Aggregator::Log ();
-	last_log_ = seconds;
+		Aggregator::Log ();
+		last_log_ = seconds;
     }
 }
 
@@ -192,19 +193,9 @@ void Aggregator::ExportPower (unsigned int dispatch_power) {
 		    power = resource->GetRatedExportPower ();
 		    resource->SetExportWatts (power);
 
-		    // AllJoyn Proxy
-		    ajn::ProxyBusObject::ProxyBusObject proxy 
-		    	= ajn::ProxyBusObject::ProxyBusObject (
-					bus_,
-					resource->GetService ().c_str(),
-					resource->GetPath ().c_str(),
-					resource->GetSession ()
-				);
-
 		    // AllJoyn Method Call
-		    ajn::Message reply(bus_);
 		    ajn::MsgArg arg("u", power);
-		    QStatus status = proxy.MethodCall(
+		    resource->proxy_.MethodCall(
 				config_["AllJoyn"]["client_interface"].c_str(),
 				"ExportPower",
 				&arg,

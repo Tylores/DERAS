@@ -1,7 +1,6 @@
 #ifndef AGGREGATOR_HPP_INCLUDED
 #define AGGREGATOR_HPP_INCLUDED
 #include "DistributedEnergyResource.hpp"
-#include <alljoyn/BusAttachment.h>
 #include <alljoyn/ProxyBusObject.h> 
 #include <string>
 #include <vector>
@@ -23,9 +22,7 @@ public:
 
     // aggregator methods
     void AddResource (std::map <std::string, unsigned int>& init,
-                      const std::string& path,
-                      const std::string& service,
-                      unsigned int session
+                      ajn::ProxyBusObject proxy
     );
     void UpdateResource (std::map <std::string, unsigned int>& init,
                          const std::string& path

@@ -7,13 +7,9 @@
 #define DEBUG(x) std::cout << x << std::endl
 
 DistributedEnergyResource::DistributedEnergyResource (
-    const std::map <std::string, unsigned int> &init,
-    const std::string &path,
-    const std::string &service,
-    unsigned int session) :
-    path_(path),
-    service_(service),
-    session_(session),
+    std::map <std::string, unsigned int> &init,
+    ajn::ProxyBusObject proxy) :
+    proxy_(proxy),
     rated_export_power_(init["rated_export_power"]),
     rated_export_energy_(init["rated_export_energy"]),
     export_ramp_(init["export_ramp"]),
@@ -64,7 +60,7 @@ void DistributedEnergyResource::SetExportPower (unsigned int power) {
 }  // end Set Export Power
 
 // Set Export Energy
-void DistributedEnergyResource::SetExportPower (unsigned int energy) {
+void DistributedEnergyResource::SetExportEnergy (unsigned int energy) {
     export_energy_ = energy;
 }  // end Set Export Energy
 
@@ -103,7 +99,7 @@ void DistributedEnergyResource::SetImportPower (unsigned int power) {
 }  // end Set Import Power
 
 // Set Import Energy
-void DistributedEnergyResource::SetImportPower (unsigned int energy) {
+void DistributedEnergyResource::SetImportEnergy (unsigned int energy) {
     import_energy_ = energy;
 }  // end Set Import Energy
 
@@ -276,7 +272,7 @@ void DistributedEnergyResource::Loop (float delta_time) {
 }  // end Control
 
 void DistributedEnergyResource::Print () {
-    std::cout << "\n[DER]: " << path_ << std::endl;
+    std::cout << "\n[DER]: " << proxy_.GetPath() << std::endl;
     std::cout
 	<< "Export Energy:\t" << export_energy_ << '\n'
         << "Export Power:\t" << export_power_ << '\n'

@@ -57,7 +57,7 @@ void ClientListener::ObjectDiscovered (ajn::ProxyBusObject& proxy) {
     std::map <std::string, unsigned int> init;
     init = ClientListener::MapProperties (values);
 
-    vpp_->AddResource (init, path, service_name, session_id);
+    vpp_->AddResource (init, proxy);
 } // end ObjectDiscovered
 
 // ObjectLost

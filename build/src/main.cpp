@@ -54,13 +54,13 @@ string LOG_PATH;
 // - CLI interface description
 static void Help () {
     cout << "\n\t[Help Menu]\n\n";
-    cout << "> q            quit\n";
-    cout << "> h            display help menu\n";
-    cout << "> a            print all resources\n";
-    cout << "> f	    print target resources\n";
-    cout << "> t	    print resource totals\n";
-    cout << "> e <watts>    send export power signal to target resources\n";
-    cout << "> i <watts>    send import power signal to target resources\n";
+    cout << "> q           quit\n";
+    cout << "> h           display help menu\n";
+    cout << "> a           print all resources\n";
+    cout << "> f	       print target resources\n";
+    cout << "> t	       print resource totals\n";
+    cout << "> e <watts>   send export power signal to target resources\n";
+    cout << "> i <watts>   send import power signal to target resources\n";
 } // end Help
 
 // Command Line Interface

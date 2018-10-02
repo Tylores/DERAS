@@ -1,13 +1,13 @@
 #ifndef DISTRIBUTEDENERGYRESOURCE_H
 #define DISTRIBUTEDENERGYRESOURCE_H
 
-#include <alljyon/ProxyBusObject>
+#include <alljoyn/ProxyBusObject.h>
 
 class DistributedEnergyResource {
     public:
         // constructor / destructor
         DistributedEnergyResource (
-            const std::map <std::string, unsigned int> &init,
+            std::map <std::string, unsigned int> &init,
             ajn::ProxyBusObject proxy
         );
         virtual ~DistributedEnergyResource ();
@@ -54,6 +54,9 @@ class DistributedEnergyResource {
         unsigned int GetIdleLosses ();
         std::string GetPath ();
 
+        // alljoyn proxy
+        ajn::ProxyBusObject proxy_;
+        
     private:
         // controls
         void ImportPower ();
@@ -61,9 +64,6 @@ class DistributedEnergyResource {
         void IdleLoss ();
 
     private:
-        // alljoyn proxy
-        ajn::ProxyBusObject proxy_;
-
         // rated export properties
         unsigned int rated_export_power_;       // (W) to grid
         unsigned int rated_export_energy_;      // (Wh)
