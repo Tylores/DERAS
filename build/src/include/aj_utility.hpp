@@ -31,7 +31,7 @@
 #include <alljoyn/Observer.h>
 #include <alljoyn/Init.h>
 
-#include "ts_utility.hpp"
+#include "tsu.h"
 
 namespace aj_utility {
 
@@ -243,7 +243,7 @@ static QStatus BuildServerInterface (std::string name,
 
 // SetupBusAttachment
 // - start/connect to alljoyn message bus and build the server/device interfaces
-static QStatus SetupBusAttachment (const tsu::config_map& ini_map,
+static QStatus SetupBusAttachment (tsu::config_map& ini_map,
                                    ajn::SessionPort& port,
                                    ajn::SessionPortListener& SPL,
                                    ajn::BusAttachment* bus_ptr,
@@ -263,17 +263,13 @@ static QStatus SetupBusAttachment (const tsu::config_map& ini_map,
     }
 
     printf("\t\t\tBuilding server interface...\n");
-    std::string server_interface = tsu::GetSectionProperty (ini_map,
-                                                       "AllJoyn",
-                                                       "server_interface");
-    status = aj_utility::BuildServerInterface (server_interface, &bus_ref);
+    std::string server_intf = ini_map["AllJoyn"]["server_inerface"];
+    status = aj_utility::BuildServerInterface (server_intf, &bus_ref);
     assert (status == ER_OK);
 
     printf("\t\t\tBuilding device interface...\n");
-    std::string client_interface = tsu::GetSectionProperty (ini_map,
-                                                       "AllJoyn",
-                                                       "client_interface");
-    status = aj_utility::BuildClientInterface (client_interface, &bus_ref);
+    std::string client_intf = ini_map["AllJoyn"]["client_interface"];
+    status = aj_utility::BuildClientInterface (client_intf, &bus_ref);
     assert (status == ER_OK);
 
     ajn::SessionOpts opts(ajn::SessionOpts::TRAFFIC_MESSAGES,

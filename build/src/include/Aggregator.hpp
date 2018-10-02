@@ -6,10 +6,12 @@
 #include <string>
 #include <vector>
 
+#include "tsu.h"
+
 class Aggregator {
 public:
     // constructor / destructor
-    Aggregator (const tsu::config_map &init, ajn::BusAttachment *bus, unsigned int increment);
+    Aggregator (tsu::config_map &init, ajn::BusAttachment *bus);
     virtual ~Aggregator ();
 
     // accessor / mutators
@@ -45,10 +47,6 @@ private:
     // aggregate
     std::vector <std::shared_ptr <DistributedEnergyResource>> resources_;
     std::vector <std::shared_ptr <DistributedEnergyResource>> sub_resources_;
-
-    // logging variables
-    unsigned int last_log_;
-    unsigned int log_inc_;  // will dicate the incraments between log events
 
     // dispatch variables
     // - these variables represent the filtered total resources based on target der

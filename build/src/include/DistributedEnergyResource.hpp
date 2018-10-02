@@ -6,12 +6,13 @@ class DistributedEnergyResource {
         // constructor / destructor
         DistributedEnergyResource (
             const std::map <std::string, unsigned int> &init,
-            const std::string& path
+            const std::string& path,
+            const std::string &service,
+            const std::string &session
         );
         virtual ~DistributedEnergyResource ();
         void Loop (float delta_time);
         void Print ();
-
 
     public:
         // set export methods        
@@ -33,14 +34,14 @@ class DistributedEnergyResource {
     public:
         // get export methods
         unsigned int GetRatedExportPower ();
-	unsigned int GetRatedExportEnergy ();
+        unsigned int GetRatedExportEnergy ();
         unsigned int GetExportPower ();
         unsigned int GetExportEnergy ();
         unsigned int GetExportRamp ();
 
         // get import methods
         unsigned int GetRatedImportPower ();
-	unsigned int GetRatedImportEnergy ();
+        unsigned int GetRatedImportEnergy ();
         unsigned int GetImportPower ();
         unsigned int GetImportEnergy ();
         unsigned int GetImportRamp ();

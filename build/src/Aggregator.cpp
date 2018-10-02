@@ -7,15 +7,13 @@
 
 #include "include/Aggregator.hpp"
 #include "include/logger.h"
-#include "include/tsu.h"
 
-Aggregator::Aggregator (const tsu::config_map &init, 
-						ajn::BusAttachment *bus, 
-						unsigned int increment) :
+Aggregator::Aggregator (tsu::config_map &init, 
+						ajn::BusAttachment *bus) :
 	config_(init),
 	bus_(bus),
 	last_log_(0),
-    log_inc_(increment),
+    log_inc_(stoul(init["Logger"]["increment"])),
 	targets_(NULL),
 	total_export_energy_(0),
 	total_export_power_(0),
@@ -42,10 +40,13 @@ unsigned int Aggregator::GetTotalImportPower () {
     return total_import_power_;
 }  // end Get Total Import Power
 
-void Aggregator::AddResource (std::map <std::string, unsigned int>& init,
-  			      const std::string& path) {
+void Aggregator::AddResource (
+	std::map <std::string, unsigned int>& init,
+	const std::string & path
+	const std::string &service,
+	const std::string & session) {
 	std::shared_ptr <DistributedEnergyResource> 
-		der (new DistributedEnergyResource (init, path));
+		der (new DistributedEnergyResource (init, path, service, session));
 	resources_.push_back (std::move (der));
 }
 
@@ -53,11 +54,15 @@ void Aggregator::UpdateResource (std::map <std::string, unsigned int>& init,
 				 const std::string& path) {
 	for (auto& resource : resources_) {
 		if (resource->GetPath() == path) {
-			resource->SetRatedExportEnergy (init["export_energy"]);
-			resource->SetRatedExportPower (init["export_power"]);
+			resource->SetRatedExportEnergy (init["rated_export_energy"]);
+			resource->SetRatedExportPower (init["rated_export_power"]);
+			resource->SetExportEnergy (init["export_energy"]);
+			resource->SetExportPower (init["export_power"]);
 			resource->SetExportRamp (init["export_ramp"]);
-			resource->SetRatedImportEnergy (init["import_energy"]);
-			resource->SetRatedImportPower (init["import_power"]);
+			resource->SetRatedImportEnergy (init["rated_import_energy"]);
+			resource->SetRatedImportPower (init["rated_import_power"]);
+			resource->SetImportEnergy (init["import_energy"]);
+			resource->SetImportPower (init["import_power"])
 			resource->SetImportRamp (init["import_ramp"]);
 			resource->SetIdleLosses (init["idle_losses"]);
 		} else {
@@ -200,7 +205,7 @@ void Aggregator::ExportPower (unsigned int dispatch_power) {
 	    ajn::Message reply(bus_);
 	    ajn::MsgArg arg("u", power);
 	    QStatus status = proxy.MethodCall(
-		config["AllJoyn"]["client_interface"], "ExportPower", &arg, 1, 0)
+		config_["AllJoyn"]["client_interface"].c_str(), "ExportPower", &arg, 1, 0)
 	    };
 
 	    // subtract resources power from dispatch power

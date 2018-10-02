@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 
-#include "include/ts_utility.hpp"
+#include "include/tsu.h"
 #include "include/aj_utility.hpp"
 #include "include/Aggregator.hpp"
 #include "include/DistributedEnergyResource.hpp"
@@ -208,7 +208,7 @@ int main (int argc, char** argv) {
     Observer *obs_ptr = new Observer(*bus_ptr, &client_name, 1);
 
     cout << "\t\tCreating virtual power plant...\n";
-    Aggregator *vpp_ptr = new Aggregator (stoul(ini_map["Logger"]["increment"]));
+    Aggregator *vpp_ptr = new Aggregator (ini_map, bus_ptr);
 
     cout << "\t\tCreating listener...\n";
     ClientListener *listner_ptr = new ClientListener(bus_ptr,

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>       // getline, stoi, stod
+#include <vector>
+#include <regex>
 #include <ctime>        // strftime, time_t, tm
 
 namespace tsu {
@@ -12,6 +14,10 @@ namespace tsu {
 // map<section, map<property, value>>
 // this is only for the INI file methods because it is huge
 typedef std::map<std::string, std::map<std::string, std::string>> config_map;
+
+// vector <vector <string>> 
+// this is used to create a matrix of strings
+typedef std::vector <std::vector <std::string>> string_matrix;
 
 template <typename T>
 static std::string ToString (T t_value) {
@@ -21,6 +27,7 @@ static std::string ToString (T t_value) {
 } // end ToString
 
 // Get Time
+// - the current time for viewing
 static std::string GetTime () {
     time_t now = time(0);
     struct tm ts = *localtime(&now);
@@ -30,6 +37,7 @@ static std::string GetTime () {
 } // end Get Time
 
 // Get Date
+// - the current date for viewing
 static std::string GetDate () {
     time_t now = time(0);
     struct tm ts = *localtime(&now);
@@ -39,6 +47,7 @@ static std::string GetDate () {
 } // end Get Date
 
 // Get Date Time
+// - the current date and time for viewing
 static std::string GetDateTime () {
     time_t now = time(0);
     struct tm ts = *localtime(&now);
@@ -49,24 +58,33 @@ static std::string GetDateTime () {
 
 
 // Get Seconds
+// - the current seconds to use in an operation
 static unsigned int GetSeconds () {
-    time_t now = time(0); 	// store current time
+    time_t now = time(0);   // store current time
     struct tm time = *localtime(&now);
     return time.tm_sec;
 }  // end Get Seconds
 
 // Get Minutes
+// - the current minutes to use in an operation
 static unsigned int GetMinutes () {
-    time_t now = time(0); 	// store current time
+    time_t now = time(0);   // store current time
     struct tm time = *localtime(&now);
     return time.tm_min;
 }  // end Get Minutes
 
 // Get Hours
+// - the current minutes to use in an operation
 static unsigned int GetHours () {
-    time_t now = time(0); 	// store current time
+    time_t now = time(0);   // store current time
     struct tm time = *localtime(&now);
     return time.tm_hour;
+}  // end Get Hours
+
+// Get Hours
+// - the current seconds since epoch to use in an operation
+static unsigned int GetUTC () {
+    return time(0);   // current time since epoch
 }  // end Get Hours
 
 // FileToString
@@ -178,6 +196,34 @@ static std::vector<std::string> FileToVector (const std::string& kFilename,
     printf("[ERROR]...what did you even do!");
     throw std::runtime_error("Error");
 } // end FileToVector
+
+// File To Matrix
+// - convert file to a vector of rows and then convert rows to a
+// - vector of vectors of columns.
+static string_matrix FileToMatrix (
+    const std::string &kFilename,
+    char kDelimiter,
+    unsigned int columns) {
+    std::vector <std::string> file_vector;
+    file_vector = FileToVector (kFilename, kDelimiter);
+
+    // determine rows in matrix
+    unsigned int count = file_vector.size();
+    unsigned int rows = count/columns;
+
+    // initialize matrix for rows/cols
+    string_matrix matrix (rows, std::vector <std::string> (columns, ""));
+
+    // iterate through file_vector to populate matrix
+    unsigned int cnt = 0;
+    for (auto &row : matrix) {
+        for (auto &col : row) {
+            col = file_vector[cnt];
+            cnt++;
+        }
+    }
+    return matrix;
+}
 
 };
 
