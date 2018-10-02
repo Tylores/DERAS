@@ -23,7 +23,9 @@ public:
 
     // aggregator methods
     void AddResource (std::map <std::string, unsigned int>& init,
-                      const std::string& path
+                      const std::string& path,
+                      const std::string& service,
+                      unsigned int session
     );
     void UpdateResource (std::map <std::string, unsigned int>& init,
                          const std::string& path
@@ -43,6 +45,10 @@ private:
 
     // alljoyn
     ajn::BusAttachment *bus_;
+    
+    // logging
+    unsigned int last_log_;
+    unsigned int log_inc_;
 
     // aggregate
     std::vector <std::shared_ptr <DistributedEnergyResource>> resources_;

@@ -1,14 +1,14 @@
 #ifndef DISTRIBUTEDENERGYRESOURCE_H
 #define DISTRIBUTEDENERGYRESOURCE_H
 
+#include <alljyon/ProxyBusObject>
+
 class DistributedEnergyResource {
     public:
         // constructor / destructor
         DistributedEnergyResource (
             const std::map <std::string, unsigned int> &init,
-            const std::string& path,
-            const std::string &service,
-            const std::string &session
+            ajn::ProxyBusObject proxy
         );
         virtual ~DistributedEnergyResource ();
         void Loop (float delta_time);
@@ -19,12 +19,16 @@ class DistributedEnergyResource {
         void SetExportWatts (unsigned int power);
         void SetRatedExportPower (unsigned int watts);
         void SetRatedExportEnergy (unsigned int watt_hours);
+        void SetExportPower(unsigned int power);
+        void SetExportEnergy (unsigned int power);
         void SetExportRamp (unsigned int watts_per_second);
 
         // set import methods
         void SetImportWatts (unsigned int power);
         void SetRatedImportPower (unsigned int watts);
         void SetRatedImportEnergy (unsigned int watt_hours);
+        void SetImportPower (unsigned int power);
+        void SetImportEnergy (unsigned int power);
         void SetImportRamp (unsigned int watts_per_second);
 
         // set idle methods
@@ -57,10 +61,8 @@ class DistributedEnergyResource {
         void IdleLoss ();
 
     private:
-        // alljoyn properties
-        std::string path_;
-        std::string service_;
-        std::string session_;
+        // alljoyn proxy
+        ajn::ProxyBusObject proxy_;
 
         // rated export properties
         unsigned int rated_export_power_;       // (W) to grid

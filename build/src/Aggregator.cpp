@@ -13,8 +13,7 @@ Aggregator::Aggregator (tsu::config_map &init,
 	config_(init),
 	bus_(bus),
 	last_log_(0),
-    log_inc_(stoul(init["Logger"]["increment"])),
-	targets_(NULL),
+	log_inc_(stoul(init["Logging"]["increment"])),
 	total_export_energy_(0),
 	total_export_power_(0),
 	total_import_energy_(0),
@@ -42,9 +41,9 @@ unsigned int Aggregator::GetTotalImportPower () {
 
 void Aggregator::AddResource (
 	std::map <std::string, unsigned int>& init,
-	const std::string & path
+	const std::string & path,
 	const std::string &service,
-	const std::string & session) {
+	unsigned int session) {
 	std::shared_ptr <DistributedEnergyResource> 
 		der (new DistributedEnergyResource (init, path, service, session));
 	resources_.push_back (std::move (der));
@@ -62,7 +61,7 @@ void Aggregator::UpdateResource (std::map <std::string, unsigned int>& init,
 			resource->SetRatedImportEnergy (init["rated_import_energy"]);
 			resource->SetRatedImportPower (init["rated_import_power"]);
 			resource->SetImportEnergy (init["import_energy"]);
-			resource->SetImportPower (init["import_power"])
+			resource->SetImportPower (init["import_power"]);
 			resource->SetImportRamp (init["import_ramp"]);
 			resource->SetIdleLosses (init["idle_losses"]);
 		} else {
@@ -176,7 +175,7 @@ void Aggregator::SortExportEnergy () {
 }
 
 // Export Power
-// - loop through target resources and send export power signal based on greatest
+// - loop through target resources and send export signal based on greatest
 // - export energy available. The signal sets both the "digital twin" and the 
 // - remote devices control watts;
 // - (TS): note we could also check to see if it is already dispatched to reduce 
@@ -188,54 +187,44 @@ void Aggregator::ExportPower (unsigned int dispatch_power) {
 
     unsigned int power = 0;
     for (auto &resource : sub_resources_) {
-	if (dispatch_power > 0) {
-	    // Digital Twin
-	    power = resource->GetRatedExportPower ();
-	    resource->SetExportWatts (power);
+		if (dispatch_power > 0) {
+		    // Digital Twin
+		    power = resource->GetRatedExportPower ();
+		    resource->SetExportWatts (power);
 
-	    // AllJoyn Proxy
-	    ajn::ProxyBusObject proxy = ajn::ProxyBusObject(
-		bus_,
-		resource->GetService ().c_str(),
-		resource->GetPath ().c_str(),
-		resource->GetSession ().c_str()
-	    }
+		    // AllJoyn Proxy
+		    ajn::ProxyBusObject::ProxyBusObject proxy 
+		    	= ajn::ProxyBusObject::ProxyBusObject (
+					bus_,
+					resource->GetService ().c_str(),
+					resource->GetPath ().c_str(),
+					resource->GetSession ()
+				);
 
-	    // AllJoyn Method Call
-	    ajn::Message reply(bus_);
-	    ajn::MsgArg arg("u", power);
-	    QStatus status = proxy.MethodCall(
-		config_["AllJoyn"]["client_interface"].c_str(), "ExportPower", &arg, 1, 0)
-	    };
+		    // AllJoyn Method Call
+		    ajn::Message reply(bus_);
+		    ajn::MsgArg arg("u", power);
+		    QStatus status = proxy.MethodCall(
+				config_["AllJoyn"]["client_interface"].c_str(),
+				"ExportPower",
+				&arg,
+				1, 
+				0
+			);
 
-	    // subtract resources power from dispatch power
-	    if (dispatch_power > power) {
-	    	dispatch_power -= power;
-	    } else {
-	   	dispatch_power = 0;
-	    }
-	} else {
-	    break;
-	}
+		    // subtract resources power from dispatch power
+		    if (dispatch_power > power) {
+		    	dispatch_power -= power;
+		    } else {
+		   		dispatch_power = 0;
+		    }
+		} else {
+		    break;
+		}
     }
 }  // end Export Power
 
 // Import Power
 void Aggregator::ImportPower (unsigned int dispatch_power) {
-    Aggregator::SortImportEnergy ();
 
-    unsigned int power = 0;
-    for (auto &resource : sub_resources_) {
-	if (dispatch_power > 0) {
-	    power = resource->GetRatedImportPower ();
-	    resource->SetImportWatts (power);
-	    if (dispatch_power > power) {
-		dispatch_power -= power;
-	    } else {
-		dispatch_power = 0;
-	    }
-	} else {
-	    break;
-	}
-    }
 }  // end Import Power
