@@ -9,12 +9,10 @@
 #include "include/logger.h"
 
 #include <alljoyn/ProxyBusObject.h>
-#include <alljoyn/BusAttachment.h>
 #include <alljoyn/Status.h>
 
-Aggregator::Aggregator (tsu::config_map &init, ajn::BusAttachment *bus) :
+Aggregator::Aggregator (tsu::config_map &init) :
 	config_(init),
-	bus_(bus),
 	last_log_(0),
 	log_inc_(stoul(init["Logger"]["increment"])),
 	total_export_energy_(0),
@@ -25,6 +23,11 @@ Aggregator::Aggregator (tsu::config_map &init, ajn::BusAttachment *bus) :
 
 Aggregator::~Aggregator () {
 }  // end destructor
+
+void Aggregator::SetTargets (const std::vector <std::string> &targets) {
+	targets_ = targets;
+	Aggregator::FilterResources ();
+}  // end Set Targets
 
 unsigned int Aggregator::GetTotalExportEnergy () {
     return total_export_energy_;
@@ -44,10 +47,12 @@ unsigned int Aggregator::GetTotalImportPower () {
 
 void Aggregator::AddResource (
 	std::map <std::string, unsigned int>& init,
-	ajn::ProxyBusObject proxy) {
+	ajn::ProxyBusObject &proxy) {
+	std::string interface = config_["AllJoyn"]["client_interface"];
 	std::shared_ptr <DistributedEnergyResource> 
-		der (new DistributedEnergyResource (init, proxy));
+		der (new DistributedEnergyResource (init, proxy, interface));
 	resources_.push_back (std::move (der));
+	Aggregator::FilterResources ();
 }
 
 void Aggregator::UpdateResource (std::map <std::string, unsigned int>& init,
@@ -82,6 +87,7 @@ void Aggregator::RemoveResource (const std::string& path) {
             it++;
         }
     }
+    Aggregator::FilterResources ();
 }
 
 void Aggregator::Loop (float delta_time) {
@@ -131,7 +137,21 @@ void Aggregator::DisplayTargetResources () {
     }
 }
 
+void Aggregator::UpdateTotals () {
+	total_export_energy_ = 0;
+	total_export_power_ = 0;
+	total_import_energy_ = 0;
+	total_import_power_ = 0;
+    for (const auto &resource : sub_resources_) {
+		total_export_energy_ += resource->GetExportEnergy ();
+		total_export_power_ += resource->GetExportPower ();
+		total_import_energy_ += resource->GetImportEnergy ();
+		total_import_power_ += resource->GetImportPower ();    	
+    }
+}
+
 void Aggregator::DisplayTotals () {
+	Aggregator::UpdateTotals ();
     std::cout << "\nAggregated Properties:!"
 	<< "\n\tTotal Export Energy = " << total_export_energy_
 	<< "\n\tTotal Export Power = " << total_export_power_
@@ -194,14 +214,7 @@ void Aggregator::ExportPower (unsigned int dispatch_power) {
 		    resource->SetExportWatts (power);
 
 		    // AllJoyn Method Call
-		    ajn::MsgArg arg("u", power);
-		    resource->proxy_.MethodCall(
-				config_["AllJoyn"]["client_interface"].c_str(),
-				"ExportPower",
-				&arg,
-				1, 
-				0
-			);
+		    resource->RemoteExportPower (power);
 
 		    // subtract resources power from dispatch power
 		    if (dispatch_power > power) {
@@ -217,5 +230,26 @@ void Aggregator::ExportPower (unsigned int dispatch_power) {
 
 // Import Power
 void Aggregator::ImportPower (unsigned int dispatch_power) {
+    Aggregator::SortImportEnergy ();
 
+    unsigned int power = 0;
+    for (auto &resource : sub_resources_) {
+		if (dispatch_power > 0) {
+		    // Digital Twin
+		    power = resource->GetRatedImportPower ();
+		    resource->SetImportWatts (power);
+
+		    // AllJoyn Method Call
+		    resource->RemoteImportPower (power);
+
+		    // subtract resources power from dispatch power
+		    if (dispatch_power > power) {
+		    	dispatch_power -= power;
+		    } else {
+		   		dispatch_power = 0;
+		    }
+		} else {
+		    break;
+		}
+    }
 }  // end Import Power

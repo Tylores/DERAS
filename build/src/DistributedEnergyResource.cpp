@@ -8,8 +8,10 @@
 
 DistributedEnergyResource::DistributedEnergyResource (
     std::map <std::string, unsigned int> &init,
-    ajn::ProxyBusObject proxy) :
+    ajn::ProxyBusObject &proxy,
+    std::string interface) :
     proxy_(proxy),
+    interface_(interface),
     rated_export_power_(init["rated_export_power"]),
     rated_export_energy_(init["rated_export_energy"]),
     export_ramp_(init["export_ramp"]),
@@ -30,6 +32,26 @@ DistributedEnergyResource::DistributedEnergyResource (
 DistributedEnergyResource::~DistributedEnergyResource () {
     //dtor
 }
+
+void DistributedEnergyResource::RemoteExportPower (unsigned int power) {
+    ajn::MsgArg arg("u",power);
+    proxy_.MethodCall(interface_.c_str(),
+                      "ExportPower",
+                      &arg,
+                      1,
+                      ajn::ALLJOYN_FLAG_NO_REPLY_EXPECTED
+    );
+}  // end Remote Export Power
+
+void DistributedEnergyResource::RemoteImportPower (unsigned int power) {
+    ajn::MsgArg arg("u",power);
+    proxy_.MethodCall(interface_.c_str(),
+                      "ImportPower",
+                      &arg,
+                      1,
+                      ajn::ALLJOYN_FLAG_NO_REPLY_EXPECTED
+    );
+}  // end Remote Import Power
 
 // Set Export Watts
 // - set the export control property used in the control loop

@@ -54,13 +54,14 @@ string LOG_PATH;
 // - CLI interface description
 static void Help () {
     cout << "\n\t[Help Menu]\n\n";
-    cout << "> q           quit\n";
-    cout << "> h           display help menu\n";
-    cout << "> a           print all resources\n";
-    cout << "> f	       print target resources\n";
-    cout << "> t	       print resource totals\n";
-    cout << "> e <watts>   send export power signal to target resources\n";
-    cout << "> i <watts>   send import power signal to target resources\n";
+    cout << "> q                    quit\n";
+    cout << "> h                    display help menu\n";
+    cout << "> a                    print all resources\n";
+    cout << "> f <arg arg ...>      print target resources\n";
+    cout << "> F                    print target resources\n";
+    cout << "> t                    print resource totals\n";
+    cout << "> e <watts>            send export signal to target resources\n";
+    cout << "> i <watts>            send import signal to target resources\n";
 } // end Help
 
 // Command Line Interface
@@ -89,7 +90,13 @@ static bool CommandLineInterface (const string& input, Aggregator* vpp) {
 	    return false;
         }
 
-	case 'f': {
+    case 'f': {
+        tokens.erase(tokens.begin());  // remove CLI command
+        vpp->SetTargets (tokens);
+        return false;
+    }
+
+	case 'F': {
 	    vpp->DisplayTargetResources ();
 	    return false;
 	}
@@ -208,7 +215,7 @@ int main (int argc, char** argv) {
     Observer *obs_ptr = new Observer(*bus_ptr, &client_name, 1);
 
     cout << "\t\tCreating virtual power plant...\n";
-    Aggregator *vpp_ptr = new Aggregator (ini_map, bus_ptr);
+    Aggregator *vpp_ptr = new Aggregator (ini_map);
 
     cout << "\t\tCreating listener...\n";
     ClientListener *listner_ptr = new ClientListener(bus_ptr,

@@ -8,9 +8,12 @@ class DistributedEnergyResource {
         // constructor / destructor
         DistributedEnergyResource (
             std::map <std::string, unsigned int> &init,
-            ajn::ProxyBusObject proxy
+            ajn::ProxyBusObject &proxy,
+            std::string interface
         );
         virtual ~DistributedEnergyResource ();
+        void RemoteExportPower (unsigned int power);
+        void RemoteImportPower (unsigned int power);
         void Loop (float delta_time);
         void Print ();
 
@@ -56,6 +59,7 @@ class DistributedEnergyResource {
 
         // alljoyn proxy
         ajn::ProxyBusObject proxy_;
+        std::string interface_;
         
     private:
         // controls
