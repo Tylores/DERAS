@@ -1,29 +1,37 @@
 #ifndef DISTRIBUTEDENERGYRESOURCE_H
 #define DISTRIBUTEDENERGYRESOURCE_H
 
+#include <alljoyn/ProxyBusObject.h>
+
 class DistributedEnergyResource {
     public:
         // constructor / destructor
         DistributedEnergyResource (
-            const std::map <std::string, unsigned int> &init,
-            const std::string& path
+            std::map <std::string, unsigned int> &init,
+            ajn::ProxyBusObject &proxy,
+            std::string interface
         );
         virtual ~DistributedEnergyResource ();
+        void RemoteExportPower (unsigned int power);
+        void RemoteImportPower (unsigned int power);
         void Loop (float delta_time);
         void Print ();
-
 
     public:
         // set export methods        
         void SetExportWatts (unsigned int power);
         void SetRatedExportPower (unsigned int watts);
         void SetRatedExportEnergy (unsigned int watt_hours);
+        void SetExportPower(unsigned int power);
+        void SetExportEnergy (unsigned int power);
         void SetExportRamp (unsigned int watts_per_second);
 
         // set import methods
         void SetImportWatts (unsigned int power);
         void SetRatedImportPower (unsigned int watts);
         void SetRatedImportEnergy (unsigned int watt_hours);
+        void SetImportPower (unsigned int power);
+        void SetImportEnergy (unsigned int power);
         void SetImportRamp (unsigned int watts_per_second);
 
         // set idle methods
@@ -33,14 +41,14 @@ class DistributedEnergyResource {
     public:
         // get export methods
         unsigned int GetRatedExportPower ();
-	unsigned int GetRatedExportEnergy ();
+        unsigned int GetRatedExportEnergy ();
         unsigned int GetExportPower ();
         unsigned int GetExportEnergy ();
         unsigned int GetExportRamp ();
 
         // get import methods
         unsigned int GetRatedImportPower ();
-	unsigned int GetRatedImportEnergy ();
+        unsigned int GetRatedImportEnergy ();
         unsigned int GetImportPower ();
         unsigned int GetImportEnergy ();
         unsigned int GetImportRamp ();
@@ -49,6 +57,10 @@ class DistributedEnergyResource {
         unsigned int GetIdleLosses ();
         std::string GetPath ();
 
+        // alljoyn proxy
+        ajn::ProxyBusObject proxy_;
+        std::string interface_;
+        
     private:
         // controls
         void ImportPower ();
@@ -56,11 +68,6 @@ class DistributedEnergyResource {
         void IdleLoss ();
 
     private:
-        // alljoyn properties
-        std::string path_;
-        std::string service_;
-        std::string session_;
-
         // rated export properties
         unsigned int rated_export_power_;       // (W) to grid
         unsigned int rated_export_energy_;      // (Wh)

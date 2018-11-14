@@ -10,9 +10,13 @@
 // (TS): this is the only way I could find to initialize a const char* array.
 //       AllJoyn documentation states "NULL" for registering all properties, but
 //       that didn't seem to work. 
-const char* ClientListener::props_[] = {"export_power",
+const char* ClientListener::props_[] = {"rated_export_power",
+                                        "rated_export_energy",
+                                        "export_power",
                                         "export_energy",
                                         "export_ramp",
+                                        "rated_import_power",
+                                        "rated_import_energy",
                                         "import_power",
                                         "import_energy",
                                         "import_ramp",
@@ -34,19 +38,17 @@ ClientListener::ClientListener(
 void ClientListener::ObjectDiscovered (ajn::ProxyBusObject& proxy) {
     std::string path = proxy.GetPath();
     std::string service_name = proxy.GetServiceName();
-    std::string unique_name = proxy.GetUniqueName();
     unsigned int session_id = proxy.GetSessionId();
 
     std::cout << "\n[LISTENER]\n";
     std::cout << "\tPath = " << path << '\n';
     std::cout << "\tService Name = " << service_name << '\n';
-    std::cout << "\tUnique Name = " << unique_name << '\n';
     std::cout << "\tSession ID = " << session_id << '\n';
 
 
     bus_->EnableConcurrentCallbacks();
     proxy.RegisterPropertiesChangedListener(
-        client_interface_, props_, 7, *this, NULL
+        client_interface_, props_, 11, *this, NULL
     );
 
     ajn::MsgArg values;
@@ -55,7 +57,7 @@ void ClientListener::ObjectDiscovered (ajn::ProxyBusObject& proxy) {
     std::map <std::string, unsigned int> init;
     init = ClientListener::MapProperties (values);
 
-    vpp_->AddResource (init, path);
+    vpp_->AddResource (init, proxy);
 } // end ObjectDiscovered
 
 // ObjectLost

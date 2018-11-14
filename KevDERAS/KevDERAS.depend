@@ -1,0 +1,341 @@
+# depslib dependency file v1.0
+1541632004 source:/home/pi/dev/DERAS/build/src/Aggregator.cpp
+	<iostream>
+	<algorithm>
+	<memory>
+	<vector>
+	<string>
+	<map>
+	"include/Aggregator.hpp"
+	"include/logger.h"
+	<alljoyn/ProxyBusObject.h>
+	<alljoyn/Status.h>
+
+1541632004 /home/pi/dev/DERAS/build/src/include/Aggregator.hpp
+	"DistributedEnergyResource.hpp"
+	<string>
+	<vector>
+	"tsu.h"
+
+1541632004 /home/pi/dev/DERAS/build/src/include/DistributedEnergyResource.hpp
+	<alljoyn/ProxyBusObject.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/ProxyBusObject.h
+	<qcc/platform.h>
+	<memory>
+	<set>
+	<qcc/String.h>
+	<alljoyn/InterfaceDescription.h>
+	<alljoyn/MessageReceiver.h>
+	<alljoyn/MsgArg.h>
+	<alljoyn/Message.h>
+	<alljoyn/Session.h>
+	<alljoyn/Status.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/platform.h
+	<qcc/posix/platform_types.h>
+	<qcc/windows/platform_types.h>
+	<qcc/windows/mapping.h>
+	<assert.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/posix/platform_types.h
+	<AvailabilityMacros.h>
+	<inttypes.h>
+	<stdint.h>
+	<stddef.h>
+	<unistd.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/String.h
+	<qcc/platform.h>
+	<string.h>
+	<string>
+	<iostream>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/InterfaceDescription.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<alljoyn/DBusStd.h>
+	<alljoyn/Message.h>
+	<alljoyn/Status.h>
+	<alljoyn/Translator.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/DBusStd.h
+	<qcc/platform.h>
+	<alljoyn/DBusStdDefines.h>
+	<alljoyn/Status.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/DBusStdDefines.h
+
+1541461262 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/Status.h
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/Message.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<qcc/ManagedObj.h>
+	<alljoyn/MsgArg.h>
+	<alljoyn/Session.h>
+	<alljoyn/Status.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/ManagedObj.h
+	<qcc/platform.h>
+	<stdlib.h>
+	<new>
+	<stdlib.h>
+	<qcc/atomic.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/atomic.h
+	<qcc/platform.h>
+	<qcc/posix/atomic.h>
+	<qcc/windows/atomic.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/posix/atomic.h
+	<qcc/platform.h>
+	<libkern/OSAtomic.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/MsgArg.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<stdarg.h>
+	<alljoyn/Status.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/Session.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<alljoyn/Status.h>
+	<alljoyn/TransportMask.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/TransportMask.h
+	<qcc/platform.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/Translator.h
+	<qcc/String.h>
+	<alljoyn/MsgArg.h>
+	<alljoyn/Status.h>
+	<cctype>
+	<map>
+	<set>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/MessageReceiver.h
+	<qcc/platform.h>
+	<alljoyn/Message.h>
+
+1541632405 /home/pi/dev/DERAS/build/src/include/tsu.h
+	<iostream>
+	<fstream>
+	<sstream>
+	<string>
+	<vector>
+	<regex>
+	<ctime>
+	<map>
+
+1541632004 /home/pi/dev/DERAS/build/src/include/logger.h
+	"tsu.h"
+	<string>
+
+1541632004 source:/home/pi/dev/DERAS/build/src/ClientListener.cpp
+	<iostream>
+	<alljoyn/ProxyBusObject.h>
+	<alljoyn/BusAttachment.h>
+	<alljoyn/Observer.h>
+	"include/ClientListener.hpp"
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/BusAttachment.h
+	<set>
+	<qcc/platform.h>
+	<qcc/String.h>
+	<alljoyn/KeyStoreListener.h>
+	<alljoyn/AuthListener.h>
+	<alljoyn/AboutListener.h>
+	<alljoyn/AboutObjectDescription.h>
+	<alljoyn/BusListener.h>
+	<alljoyn/BusObject.h>
+	<alljoyn/ProxyBusObject.h>
+	<alljoyn/InterfaceDescription.h>
+	<alljoyn/Session.h>
+	<alljoyn/SessionListener.h>
+	<alljoyn/SessionPortListener.h>
+	<alljoyn/Status.h>
+	<alljoyn/Translator.h>
+	<alljoyn/ApplicationStateListener.h>
+	<alljoyn/PermissionPolicy.h>
+	<alljoyn/PermissionConfigurator.h>
+	<alljoyn/PermissionConfigurationListener.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/KeyStoreListener.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<alljoyn/Status.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/AuthListener.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<alljoyn/Message.h>
+	<alljoyn/Status.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/AboutListener.h
+	<alljoyn/Session.h>
+	<alljoyn/AboutData.h>
+	<alljoyn/AboutObjectDescription.h>
+	<alljoyn/InterfaceDescription.h>
+	<alljoyn/Message.h>
+	<alljoyn/MessageReceiver.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/AboutData.h
+	<alljoyn/AboutDataListener.h>
+	<alljoyn/AboutKeys.h>
+	<alljoyn/MsgArg.h>
+	<alljoyn/Status.h>
+	<alljoyn/Translator.h>
+	<qcc/String.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/AboutDataListener.h
+	<alljoyn/MsgArg.h>
+	<alljoyn/Status.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/AboutKeys.h
+	<alljoyn/AboutDataListener.h>
+	<alljoyn/MsgArg.h>
+	<alljoyn/Status.h>
+	<qcc/String.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/AboutObjectDescription.h
+	<alljoyn/MsgArg.h>
+	<alljoyn/Status.h>
+	<qcc/String.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/BusListener.h
+	<alljoyn/TransportMask.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/BusObject.h
+	<qcc/platform.h>
+	<vector>
+	<qcc/String.h>
+	<alljoyn/InterfaceDescription.h>
+	<alljoyn/MsgArg.h>
+	<alljoyn/MessageReceiver.h>
+	<alljoyn/Session.h>
+	<alljoyn/Status.h>
+	<alljoyn/Translator.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/SessionListener.h
+	<alljoyn/Session.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/SessionPortListener.h
+	<alljoyn/Session.h>
+	<alljoyn/SessionListener.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/ApplicationStateListener.h
+	<alljoyn/PermissionConfigurator.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/PermissionConfigurator.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<qcc/CertificateECC.h>
+	<alljoyn/Status.h>
+	<alljoyn/PermissionPolicy.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/CertificateECC.h
+	<qcc/platform.h>
+	<qcc/GUID.h>
+	<qcc/CryptoECC.h>
+	<qcc/KeyInfoECC.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/GUID.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<string.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/CryptoECC.h
+	<alljoyn/Status.h>
+	<qcc/platform.h>
+	<qcc/String.h>
+	<qcc/GUID.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/KeyInfoECC.h
+	<qcc/platform.h>
+	<qcc/KeyInfo.h>
+	<qcc/CryptoECC.h>
+
+1541458246 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/qcc/KeyInfo.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<alljoyn/Status.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/PermissionPolicy.h
+	<qcc/platform.h>
+	<qcc/String.h>
+	<qcc/KeyInfoECC.h>
+	<qcc/GUID.h>
+	<qcc/CertificateECC.h>
+	<alljoyn/Status.h>
+	<alljoyn/MsgArg.h>
+	<alljoyn/Message.h>
+	<vector>
+	<string>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/PermissionConfigurationListener.h
+	<alljoyn/Status.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/Observer.h
+	<qcc/String.h>
+	<alljoyn/InterfaceDescription.h>
+	<alljoyn/ProxyBusObject.h>
+	<alljoyn/BusAttachment.h>
+	<alljoyn/Status.h>
+
+1541632004 /home/pi/dev/DERAS/build/src/include/ClientListener.hpp
+	"Aggregator.hpp"
+
+1541632004 source:/home/pi/dev/DERAS/build/src/DistributedEnergyResource.cpp
+	<iostream>
+	<string>
+	<map>
+	"include/DistributedEnergyResource.hpp"
+
+1541632004 source:/home/pi/dev/DERAS/build/src/logger.cpp
+	"include/logger.h"
+	<iostream>
+	<fstream>
+
+1541632004 source:/home/pi/dev/DERAS/build/src/main.cpp
+	<iostream>
+	<thread>
+	<chrono>
+	<map>
+	<string>
+	<vector>
+	"include/tsu.h"
+	"include/aj_utility.hpp"
+	"include/Aggregator.hpp"
+	"include/DistributedEnergyResource.hpp"
+	"include/ClientListener.hpp"
+	"include/SmartGridDevice.hpp"
+
+1541632004 /home/pi/dev/DERAS/build/src/include/aj_utility.hpp
+	<alljoyn/Status.h>
+	<alljoyn/AboutObj.h>
+	<alljoyn/BusAttachment.h>
+	<alljoyn/Observer.h>
+	<alljoyn/Init.h>
+	"tsu.h"
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/AboutObj.h
+	<alljoyn/AboutDataListener.h>
+	<alljoyn/AboutListener.h>
+	<alljoyn/BusAttachment.h>
+	<alljoyn/BusObject.h>
+
+1541458244 /home/pi/src/core-alljoyn/build/linux/arm/debug/dist/cpp/inc/alljoyn/Init.h
+	<qcc/platform.h>
+	<alljoyn/Status.h>
+
+1541632004 /home/pi/dev/DERAS/build/src/include/SmartGridDevice.hpp
+	"DistributedEnergyResource.hpp"
+
+1541632004 source:/home/pi/dev/DERAS/build/src/SmartGridDevice.cpp
+	<alljoyn/Status.h>
+	<alljoyn/BusObject.h>
+	<alljoyn/BusAttachment.h>
+	"include/SmartGridDevice.hpp"
+

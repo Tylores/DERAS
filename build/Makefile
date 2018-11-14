@@ -1,7 +1,7 @@
 # This makefile is described by the following link
 # https://hiltmon.com/blog/2015/09/28/the-simple-c-plus-plus-makefile-executable-edition/
 
-CC := g++-5  #main compiler
+CC := g++  #main compiler
 
 # Project Directory
 SRCDIR := src

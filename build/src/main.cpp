@@ -37,12 +37,15 @@
 #include <string>
 #include <vector>
 
-#include "include/ts_utility.hpp"
+#include "include/tsu.h"
 #include "include/aj_utility.hpp"
 #include "include/Aggregator.hpp"
 #include "include/DistributedEnergyResource.hpp"
 #include "include/ClientListener.hpp"
 #include "include/SmartGridDevice.hpp"
+//#include "include/Operator.h"
+//#include "include/ScheduleOperator.h"
+#include "include/ScheduleOperator.cpp"
 
 using namespace std;
 using namespace ajn;
@@ -54,13 +57,14 @@ string LOG_PATH;
 // - CLI interface description
 static void Help () {
     cout << "\n\t[Help Menu]\n\n";
-    cout << "> q            quit\n";
-    cout << "> h            display help menu\n";
-    cout << "> a            print all resources\n";
-    cout << "> f	    print target resources\n";
-    cout << "> t	    print resource totals\n";
-    cout << "> e <watts>    send export power signal to target resources\n";
-    cout << "> i <watts>    send import power signal to target resources\n";
+    cout << "> q                    quit\n";
+    cout << "> h                    display help menu\n";
+    cout << "> a                    print all resources\n";
+    cout << "> f <arg arg ...>      print target resources\n";
+    cout << "> F                    print target resources\n";
+    cout << "> t                    print resource totals\n";
+    cout << "> e <watts>            send export signal to target resources\n";
+    cout << "> i <watts>            send import signal to target resources\n";
 } // end Help
 
 // Command Line Interface
@@ -89,7 +93,13 @@ static bool CommandLineInterface (const string& input, Aggregator* vpp) {
 	    return false;
         }
 
-	case 'f': {
+    case 'f': {
+        tokens.erase(tokens.begin());  // remove CLI command
+        vpp->SetTargets (tokens);
+        return false;
+    }
+
+	case 'F': {
 	    vpp->DisplayTargetResources ();
 	    return false;
 	}
@@ -147,6 +157,32 @@ void AggregatorLoop (Aggregator *VPP) {
     }
 }  // end Aggregator Loop
 
+
+void OperLoop (ScheduleOperator *Oper) {
+	unsigned int time_remaining, time_past;
+    unsigned int time_wait = 1000;
+    auto time_start = chrono::high_resolution_clock::now();
+    auto time_end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> time_elapsed;
+
+    while (!done) {
+        time_start = chrono::high_resolution_clock::now();
+            // time since last control call;
+            time_elapsed = time_start - time_end;
+            time_past = time_elapsed.count();
+            Oper->Loop();
+        time_end = chrono::high_resolution_clock::now();
+        time_elapsed = time_end - time_start;
+
+        // determine sleep duration after deducting process time
+        time_remaining = (time_wait - time_elapsed.count());
+        time_remaining = (time_remaining > 0) ? time_remaining : 0;
+        this_thread::sleep_for (chrono::milliseconds (time_remaining));
+    }
+}  // end Control Loop
+
+
+
 // Main
 // ----
 int main (int argc, char** argv) {
@@ -154,7 +190,7 @@ int main (int argc, char** argv) {
     cout << "\tMapping configuration file...\n";
     tsu::config_map ini_map = tsu::MapConfigFile("../data/config.ini");
 
-    // (TS): I set this to global because I can't think of a good way to make it 
+    // (TS): I set this to global because I can't think of a good way to make it
     // available to all files.
     LOG_PATH = ini_map["Logging"]["path"];
 
@@ -208,7 +244,7 @@ int main (int argc, char** argv) {
     Observer *obs_ptr = new Observer(*bus_ptr, &client_name, 1);
 
     cout << "\t\tCreating virtual power plant...\n";
-    Aggregator *vpp_ptr = new Aggregator (stoul(ini_map["Logger"]["increment"]));
+    Aggregator *vpp_ptr = new Aggregator (ini_map);
 
     cout << "\t\tCreating listener...\n";
     ClientListener *listner_ptr = new ClientListener(bus_ptr,
@@ -220,8 +256,8 @@ int main (int argc, char** argv) {
     cout << "\t\tCreating bus object...\n";
     const char* server_name = ini_map["AllJoyn"]["server_interface"].c_str();
     const char* path = ini_map["AllJoyn"]["path"].c_str();
-    SmartGridDevice *sgd_ptr = new SmartGridDevice(bus_ptr, 
-                                                   server_name, 
+    SmartGridDevice *sgd_ptr = new SmartGridDevice(bus_ptr,
+                                                   server_name,
                                                    path);
 
     cout << "\t\t\tRegistering bus object...\n";
@@ -236,6 +272,22 @@ int main (int argc, char** argv) {
 
     thread VPP (AggregatorLoop, vpp_ptr);
 
+
+    cout << "Test\n";
+
+
+    //Operator *opr_ptr = new Operator("timeActExt.csv", vpp_ptr);
+
+	//thread Oper(OperLoop, opr_ptr); //Same as controll loop, except EWH->Loop(), Oper->Loop()
+
+    ScheduleOperator *opr_ptr = new ScheduleOperator("../data/timeActExt.csv", vpp_ptr);
+	thread Oper(OperLoop, opr_ptr); //Same as control loop, except EWH->Loop(), Oper->Loop()
+
+
+//       End of Inserted Operator Code.
+
+
+
     Help ();
     string input;
 
@@ -248,6 +300,7 @@ int main (int argc, char** argv) {
     cout << "\t Joining threads...\n";
     VPP.join ();
 
+	Oper.join();  //Added by Kevin. This waits for the loop to close, and closes the thread.
     cout << "\t deleting pointers...\n";
     delete sgd_ptr;
     delete listner_ptr;
@@ -255,6 +308,9 @@ int main (int argc, char** argv) {
     delete obs_ptr;
     delete about_ptr;
     delete bus_ptr;
+	delete opr_ptr;
+
+
 
     cout << "\t Shutting down AllJoyn...\n";
     obs_ptr->UnregisterAllListeners ();
@@ -262,6 +318,7 @@ int main (int argc, char** argv) {
     #ifdef ROUTER
         AllJoynRouterShutdown ();
     #endif // ROUTER
+
 
     AllJoynShutdown ();
 

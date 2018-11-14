@@ -7,13 +7,11 @@
 #define DEBUG(x) std::cout << x << std::endl
 
 DistributedEnergyResource::DistributedEnergyResource (
-    const std::map <std::string, unsigned int> &init,
-    const std::string &path,
-    const std::string &service,
-    const std::string &session) :
-    path_(path),
-    service_(service),
-    session_(session),
+    std::map <std::string, unsigned int> &init,
+    ajn::ProxyBusObject &proxy,
+    std::string interface) :
+    proxy_(proxy),
+    interface_(interface),
     rated_export_power_(init["rated_export_power"]),
     rated_export_energy_(init["rated_export_energy"]),
     export_ramp_(init["export_ramp"]),
@@ -34,6 +32,26 @@ DistributedEnergyResource::DistributedEnergyResource (
 DistributedEnergyResource::~DistributedEnergyResource () {
     //dtor
 }
+
+void DistributedEnergyResource::RemoteExportPower (unsigned int power) {
+    ajn::MsgArg arg("u",power);
+    proxy_.MethodCall(interface_.c_str(),
+                      "ExportPower",
+                      &arg,
+                      1,
+                      ajn::ALLJOYN_FLAG_NO_REPLY_EXPECTED
+    );
+}  // end Remote Export Power
+
+void DistributedEnergyResource::RemoteImportPower (unsigned int power) {
+    ajn::MsgArg arg("u",power);
+    proxy_.MethodCall(interface_.c_str(),
+                      "ImportPower",
+                      &arg,
+                      1,
+                      ajn::ALLJOYN_FLAG_NO_REPLY_EXPECTED
+    );
+}  // end Remote Import Power
 
 // Set Export Watts
 // - set the export control property used in the control loop
@@ -56,6 +74,16 @@ void DistributedEnergyResource::SetRatedExportPower (unsigned int power) {
 // - set the watt-hour value available to export to the grid
 void DistributedEnergyResource::SetRatedExportEnergy (unsigned int energy) {
     rated_export_energy_ = energy;
+}  // end Set Export Energy
+
+// Set Export Power
+void DistributedEnergyResource::SetExportPower (unsigned int power) {
+    export_power_ = power;
+}  // end Set Export Power
+
+// Set Export Energy
+void DistributedEnergyResource::SetExportEnergy (unsigned int energy) {
+    export_energy_ = energy;
 }  // end Set Export Energy
 
 // Set Export Ramp
@@ -85,6 +113,16 @@ void DistributedEnergyResource::SetRatedImportPower (unsigned int power) {
 // - set the watt-hour value available to import from the grid
 void DistributedEnergyResource::SetRatedImportEnergy (unsigned int energy) {
     rated_import_energy_ = energy;
+}  // end Set Import Energy
+
+// Set Import Power
+void DistributedEnergyResource::SetImportPower (unsigned int power) {
+    import_power_ = power;
+}  // end Set Import Power
+
+// Set Import Energy
+void DistributedEnergyResource::SetImportEnergy (unsigned int energy) {
+    import_energy_ = energy;
 }  // end Set Import Energy
 
 // Set Import Ramp
@@ -168,8 +206,9 @@ unsigned int DistributedEnergyResource::GetIdleLosses () {
 // Get Path
 // - get the path to the DER
 std::string DistributedEnergyResource::GetPath () {
-    return path_;
+    return proxy_.GetPath ();
 }  // end Get Idle Losses
+
 // Import Power
 // - called by control loop if import power is set
 // - assume loss is factored into import power
@@ -255,7 +294,7 @@ void DistributedEnergyResource::Loop (float delta_time) {
 }  // end Control
 
 void DistributedEnergyResource::Print () {
-    std::cout << "\n[DER]: " << path_ << std::endl;
+    std::cout << "\n[DER]: " << proxy_.GetPath() << std::endl;
     std::cout
 	<< "Export Energy:\t" << export_energy_ << '\n'
         << "Export Power:\t" << export_power_ << '\n'

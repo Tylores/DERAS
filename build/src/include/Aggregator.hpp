@@ -1,19 +1,19 @@
 #ifndef AGGREGATOR_HPP_INCLUDED
 #define AGGREGATOR_HPP_INCLUDED
 #include "DistributedEnergyResource.hpp"
-#include <alljoyn/BusAttachment.h>
-#include <alljoyn/ProxyBusObject.h> 
 #include <string>
 #include <vector>
+
+#include "tsu.h"
 
 class Aggregator {
 public:
     // constructor / destructor
-    Aggregator (const tsu::config_map &init, ajn::BusAttachment *bus, unsigned int increment);
+    Aggregator (tsu::config_map &init);
     virtual ~Aggregator ();
 
     // accessor / mutators
-    void SetTargets (const std::vector <std::string> &args);
+    void SetTargets (const std::vector <std::string> &targets);
     unsigned int GetTotalExportEnergy ();
     unsigned int GetTotalExportPower ();
     unsigned int GetTotalImportEnergy ();
@@ -21,7 +21,7 @@ public:
 
     // aggregator methods
     void AddResource (std::map <std::string, unsigned int>& init,
-                      const std::string& path
+                      ajn::ProxyBusObject &proxy
     );
     void UpdateResource (std::map <std::string, unsigned int>& init,
                          const std::string& path
@@ -31,6 +31,7 @@ public:
     void Log ();
     void DisplayAllResources ();
     void DisplayTargetResources ();
+    void UpdateTotals ();
     void DisplayTotals ();
     void ExportPower (unsigned int dispatch_power);
     void ImportPower (unsigned int dispatch_power);
@@ -38,17 +39,14 @@ public:
 private:
     // config map
     tsu::config_map config_;
-
-    // alljoyn
-    ajn::BusAttachment *bus_;
+   
+    // logging
+    unsigned int last_log_;
+    unsigned int log_inc_;
 
     // aggregate
     std::vector <std::shared_ptr <DistributedEnergyResource>> resources_;
     std::vector <std::shared_ptr <DistributedEnergyResource>> sub_resources_;
-
-    // logging variables
-    unsigned int last_log_;
-    unsigned int log_inc_;  // will dicate the incraments between log events
 
     // dispatch variables
     // - these variables represent the filtered total resources based on target der
