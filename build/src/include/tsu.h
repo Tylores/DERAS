@@ -8,6 +8,7 @@
 #include <vector>
 #include <regex>
 #include <ctime>        // strftime, time_t, tm
+#include <map>
 
 namespace tsu {
 
@@ -15,7 +16,7 @@ namespace tsu {
 // this is only for the INI file methods because it is huge
 typedef std::map<std::string, std::map<std::string, std::string>> config_map;
 
-// vector <vector <string>> 
+// vector <vector <string>>
 // this is used to create a matrix of strings
 typedef std::vector <std::vector <std::string>> string_matrix;
 

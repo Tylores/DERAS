@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # setup environment
-export CPU=x86_64
+export CPU=arm
 export OS=linux
 export VARIANT=debug
 export AJ_ROOT=$HOME/src/core-alljoyn

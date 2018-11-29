@@ -37,12 +37,16 @@
 #include <string>
 #include <vector>
 
+#include "include/SetPoint.h"
+#include "include/xml2schedule.h"
+//#include "include/schedulizer.h"
 #include "include/tsu.h"
 #include "include/aj_utility.hpp"
 #include "include/Aggregator.hpp"
 #include "include/DistributedEnergyResource.hpp"
 #include "include/ClientListener.hpp"
 #include "include/SmartGridDevice.hpp"
+#include "include/ScheduleOperator.h"
 
 using namespace std;
 using namespace ajn;
@@ -154,14 +158,42 @@ void AggregatorLoop (Aggregator *VPP) {
     }
 }  // end Aggregator Loop
 
+
+void OperLoop (ScheduleOperator *Oper) {
+	unsigned int time_remaining, time_past;
+    unsigned int time_wait = 1000;
+    auto time_start = chrono::high_resolution_clock::now();
+    auto time_end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> time_elapsed;
+
+    while (!done) {
+        time_start = chrono::high_resolution_clock::now();
+            // time since last control call;
+            time_elapsed = time_start - time_end;
+            time_past = time_elapsed.count();
+            Oper->Loop();
+        time_end = chrono::high_resolution_clock::now();
+        time_elapsed = time_end - time_start;
+
+        // determine sleep duration after deducting process time
+        time_remaining = (time_wait - time_elapsed.count());
+        time_remaining = (time_remaining > 0) ? time_remaining : 0;
+        this_thread::sleep_for (chrono::milliseconds (time_remaining));
+    }
+}  // end Operator Loop
+
+
+
+
 // Main
 // ----
 int main (int argc, char** argv) {
     cout << "\nStarting Program...\n";
     cout << "\tMapping configuration file...\n";
-    tsu::config_map ini_map = tsu::MapConfigFile("../data/config.ini");
+    // Tylor: you might want to change this later. - Kevin
+    tsu::config_map ini_map = tsu::MapConfigFile("../DERAS/data/config.ini");
 
-    // (TS): I set this to global because I can't think of a good way to make it 
+    // (TS): I set this to global because I can't think of a good way to make it
     // available to all files.
     LOG_PATH = ini_map["Logging"]["path"];
 
@@ -227,8 +259,8 @@ int main (int argc, char** argv) {
     cout << "\t\tCreating bus object...\n";
     const char* server_name = ini_map["AllJoyn"]["server_interface"].c_str();
     const char* path = ini_map["AllJoyn"]["path"].c_str();
-    SmartGridDevice *sgd_ptr = new SmartGridDevice(bus_ptr, 
-                                                   server_name, 
+    SmartGridDevice *sgd_ptr = new SmartGridDevice(bus_ptr,
+                                                   server_name,
                                                    path);
 
     cout << "\t\t\tRegistering bus object...\n";
@@ -243,6 +275,25 @@ int main (int argc, char** argv) {
 
     thread VPP (AggregatorLoop, vpp_ptr);
 
+
+// Beginning of Inserted Operator Code
+
+    //Schedulizer("../DERAS/data/timeActExt.csv")
+
+    std::vector<SetPoint> schedule = xml2schedule("../DERAS/data/EIM.xml");
+
+
+    //ScheduleOperator *opr_ptr = new ScheduleOperator("../DERAS/data/timeActExt.csv", vpp_ptr);
+	ScheduleOperator *opr_ptr = new ScheduleOperator(schedule, vpp_ptr);
+	thread Oper(OperLoop, opr_ptr); //Same as control loop, except EWH->Loop(), Oper->Loop()
+
+
+//       End of Inserted Operator Code.
+
+
+
+
+
     Help ();
     string input;
 
@@ -254,6 +305,8 @@ int main (int argc, char** argv) {
     cout << "Program shutting down...\n";
     cout << "\t Joining threads...\n";
     VPP.join ();
+	Oper.join();  //Added by Kevin.
+                  //Waits for the loop to close, and then closes the thread.
 
     cout << "\t deleting pointers...\n";
     delete sgd_ptr;
