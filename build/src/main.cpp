@@ -37,15 +37,16 @@
 #include <string>
 #include <vector>
 
+#include "include/SetPoint.h"
+#include "include/xml2schedule.h"
+//#include "include/schedulizer.h"
 #include "include/tsu.h"
 #include "include/aj_utility.hpp"
 #include "include/Aggregator.hpp"
 #include "include/DistributedEnergyResource.hpp"
 #include "include/ClientListener.hpp"
 #include "include/SmartGridDevice.hpp"
-//#include "include/Operator.h"
-//#include "include/ScheduleOperator.h"
-#include "include/ScheduleOperator.cpp"
+#include "include/ScheduleOperator.h"
 
 using namespace std;
 using namespace ajn;
@@ -179,7 +180,8 @@ void OperLoop (ScheduleOperator *Oper) {
         time_remaining = (time_remaining > 0) ? time_remaining : 0;
         this_thread::sleep_for (chrono::milliseconds (time_remaining));
     }
-}  // end Control Loop
+}  // end Operator Loop
+
 
 
 
@@ -188,7 +190,8 @@ void OperLoop (ScheduleOperator *Oper) {
 int main (int argc, char** argv) {
     cout << "\nStarting Program...\n";
     cout << "\tMapping configuration file...\n";
-    tsu::config_map ini_map = tsu::MapConfigFile("../data/config.ini");
+    // Tylor: you might want to change this later. - Kevin
+    tsu::config_map ini_map = tsu::MapConfigFile("../DERAS/data/config.ini");
 
     // (TS): I set this to global because I can't think of a good way to make it
     // available to all files.
@@ -273,18 +276,21 @@ int main (int argc, char** argv) {
     thread VPP (AggregatorLoop, vpp_ptr);
 
 
-    cout << "Test\n";
+// Beginning of Inserted Operator Code
+
+    //Schedulizer("../DERAS/data/timeActExt.csv")
+
+    std::vector<SetPoint> schedule = xml2schedule("../DERAS/data/EIM.xml");
 
 
-    //Operator *opr_ptr = new Operator("timeActExt.csv", vpp_ptr);
-
-	//thread Oper(OperLoop, opr_ptr); //Same as controll loop, except EWH->Loop(), Oper->Loop()
-
-    ScheduleOperator *opr_ptr = new ScheduleOperator("../data/timeActExt.csv", vpp_ptr);
+    //ScheduleOperator *opr_ptr = new ScheduleOperator("../DERAS/data/timeActExt.csv", vpp_ptr);
+	ScheduleOperator *opr_ptr = new ScheduleOperator(schedule, vpp_ptr);
 	thread Oper(OperLoop, opr_ptr); //Same as control loop, except EWH->Loop(), Oper->Loop()
 
 
 //       End of Inserted Operator Code.
+
+
 
 
 
@@ -299,8 +305,9 @@ int main (int argc, char** argv) {
     cout << "Program shutting down...\n";
     cout << "\t Joining threads...\n";
     VPP.join ();
+	Oper.join();  //Added by Kevin.
+                  //Waits for the loop to close, and then closes the thread.
 
-	Oper.join();  //Added by Kevin. This waits for the loop to close, and closes the thread.
     cout << "\t deleting pointers...\n";
     delete sgd_ptr;
     delete listner_ptr;
@@ -308,9 +315,6 @@ int main (int argc, char** argv) {
     delete obs_ptr;
     delete about_ptr;
     delete bus_ptr;
-	delete opr_ptr;
-
-
 
     cout << "\t Shutting down AllJoyn...\n";
     obs_ptr->UnregisterAllListeners ();
@@ -318,7 +322,6 @@ int main (int argc, char** argv) {
     #ifdef ROUTER
         AllJoynRouterShutdown ();
     #endif // ROUTER
-
 
     AllJoynShutdown ();
 
